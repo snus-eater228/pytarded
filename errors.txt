@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/script2.rpy", line 1607: Line is followed by a block, despite not being a menu choice. Did you forget a colon at the end of the line?
+    "сам сожру вкусно же пиздец"
+                                ^
+
+Ren'Py Version: Ren'Py 8.3.7.25031702
+Sat Aug  1 13:13:48 2026

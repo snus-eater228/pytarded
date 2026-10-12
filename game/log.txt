@@ -1,0 +1,60 @@
+DZ: print("A")
+
+DZ: print("я даун")
+
+
+DZ: print(G)
+
+
+DZ: 
+
+
+DZ: print
+
+
+DZ: 
+
+
+CREATE TABLE prosody_account (
+    user VARCHAR(100) NOT NULL,
+    host VARCHAR(100) NOT NULL,
+    key VARCHAR(100) NOT NULL,
+    type VARCHAR(100) NULL,
+    value TEXT NULL,
+    PRIMARY KEY (user, host, key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE prosody_roster (
+    user VARCHAR(100) NOT NULL,
+    host VARCHAR(100) NOT NULL,
+    key VARCHAR(100) NOT NULL,
+    type VARCHAR(100) NULL,
+    value TEXT NULL,
+    PRIMARY KEY (user, host, key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE prosody_vcard (
+    user VARCHAR(100) NOT NULL,
+    host VARCHAR(100) NOT NULL,
+    key VARCHAR(100) NOT NULL,
+    type VARCHAR(100) NULL,
+    value TEXT NULL,
+    PRIMARY KEY (user, host, key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;DZ: print("Меня зовут Ларс мне 17 лет я люблю поесть пельмени")
+
+
+DZ: f
+
+
+DZ: print("меня зовут ларс я люблю говно")
+
+
+DZ: print("Меня зовут Ларс, мне 16 лет, я люблю поесть говна")
+
+
+DZ: name = "Ларс"
+age = 17
+food = "говно"
+print(f"Меня зовут {name}, мне {age} лет, я люблю поесть {food}")
+
+
