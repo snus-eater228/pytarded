@@ -1,48 +1,32 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-After initialization, but before game start.
-  File "game/facetime.rpy", line 18, in analyze_screen
-    screen facetime:
-  File "game/facetime.rpy", line 18, in analyze
-    screen facetime:
-  File "game/facetime.rpy", line 18, in analyze
-    screen facetime:
-  File "game/facetime.rpy", line 24, in analyze
-    if store.facetime_character == "james" and :
-SyntaxError: unexpected EOF while parsing (facetime.rpy, line 24)
+While running game code:
+  File "game/shaders.rpy", line 180, in execute_default
+    default fever_intensity = 0.5
+Exception: store.fever_intensity is being given a default a second time.
 
 -- Full Traceback ------------------------------------------------------------
 
-Full traceback:
-  File "/Applications/renpy-8.3.7-sdk/renpy/bootstrap.py", line 359, in bootstrap
-    renpy.main.main()
-  File "/Applications/renpy-8.3.7-sdk/renpy/main.py", line 652, in main
-    run(restart)
-  File "/Applications/renpy-8.3.7-sdk/renpy/main.py", line 86, in run
-    renpy.display.screen.analyze_screens()
-  File "/Applications/renpy-8.3.7-sdk/renpy/display/screen.py", line 997, in analyze_screens
-    s.ast.analyze_screen()
-  File "game/facetime.rpy", line 18, in analyze_screen
-    screen facetime:
-  File "game/facetime.rpy", line 18, in analyze
-    screen facetime:
-  File "game/facetime.rpy", line 18, in analyze
-    screen facetime:
-  File "game/facetime.rpy", line 24, in analyze
-    if store.facetime_character == "james" and :
-  File "/Applications/renpy-8.3.7-sdk/renpy/py3analysis.py", line 559, in is_constant_expr
-    node, literal = ccache.ast_eval_literal(expr)
-  File "/Applications/renpy-8.3.7-sdk/renpy/py3analysis.py", line 785, in ast_eval_literal
-    expr = py_compile(expr, 'eval', ast_node=True)
-  File "/Applications/renpy-8.3.7-sdk/renpy/python.py", line 1153, in py_compile
-    raise e
-  File "/Applications/renpy-8.3.7-sdk/renpy/python.py", line 1090, in py_compile
-    raise orig_e
-  File "/Applications/renpy-8.3.7-sdk/renpy/python.py", line 1082, in py_compile
-    tree = compile(source, filename, py_mode, ast.PyCF_ONLY_AST | flags, 1)
-SyntaxError: unexpected EOF while parsing (facetime.rpy, line 24)
+Traceback (most recent call last):
+  File "renpy/common/00start.rpy", line 210, in script
+    python:
+  File "renpy/ast.py", line 1193, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/python.py", line 1276, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/common/00start.rpy", line 211, in <module>
+    renpy.execute_default_statement(True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "renpy/exports/statementexports.py", line 368, in execute_default_statement
+    i.execute_default(start)
+    ~~~~~~~~~~~~~~~~~^^^^^^^
+  File "game/shaders.rpy", line 180, in execute_default
+    default fever_intensity = 0.5
+Exception: store.fever_intensity is being given a default a second time.
 
-macOS-26.2-arm64-arm-64bit arm64
-Ren'Py 8.3.7.25031702
+macOS-26.6.2-arm64-arm-64bit arm64
+Ren'Py 8.5.3.26051504
 pytarded 1.0
-Thu Feb 26 16:31:38 2026
+Sun Oct 18 03:57:44 2026

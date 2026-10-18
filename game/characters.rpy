@@ -94,7 +94,10 @@ image lars cow greeting demo:
 image lars please = At("lars please demo", sprite_highlight('lars'))
 image lars please demo:
     "images/lars please.png"
-    zoom lars_zoom__koef
+image lars test = At("lars test demo", sprite_highlight('lars'))
+image lars test demo:
+    "images/lars test.png"
+    zoom 2
 image lars cow offense = At("lars cow offense demo", sprite_highlight('lars'))
 image lars cow offense demo:
     "images/lars cow offense.png"

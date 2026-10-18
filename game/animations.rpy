@@ -560,3 +560,191 @@ image psycho1:
     "images/psycho1/134.jpg"
     pause 0.05
     repeat
+
+init python:
+    import math
+    import pygame
+    
+    class EllipseEye(renpy.Displayable):
+        def __init__(self, animation_func, **kwargs):
+            super(EllipseEye, self).__init__(**kwargs)
+            self.animation_func = animation_func
+        
+        def render(self, width, height, st, at):
+            # Создаем поверхность с прозрачностью
+            surface = pygame.Surface((width, height), pygame.SRCALPHA)
+            
+            # Получаем текущее сжатие
+            compression = self.animation_func(st)
+            compression = max(0.0, min(1.0, compression))
+            
+            margin_factor = 1.1
+            center_x = width / 2
+            center_y = height / 2
+            
+            a = (width / 2) * margin_factor
+            b = (height / 2) * margin_factor * compression
+            
+            # 1. Заполняем ВСЮ поверхность черным с высокой непрозрачностью (маска)
+            # Альфа 230 из 255 = ~90% непрозрачности
+            surface.fill((0, 0, 0, 230))
+            
+            # 2. Рисуем эллипс с альфа=0 (полностью прозрачный) - это вырежет "дырку"
+            points = []
+            num_points = 360
+            for i in range(num_points):
+                t = (i / num_points) * 2 * math.pi
+                x = center_x + a * math.cos(t)
+                y = center_y + b * math.sin(t)
+                points.append((int(x), int(y)))
+            
+            if len(points) > 2:
+                # Рисуем эллипс с альфа=0 (прозрачный) - создаем дырку в маске
+                pygame.draw.polygon(surface, (0, 0, 0, 0), points)
+            
+            # 3. Принудительно запрашиваем перерисовку следующего кадра
+            renpy.redraw(self, 0)
+            
+            render = renpy.Render(width, height)
+            render.blit(surface, (0, 0))
+            return render
+        
+        def event(self, ev, x, y, st):
+            return None
+        
+        def visit(self):
+            return []
+
+    # --- Функции анимации (принимают ТОЛЬКО st) ---
+    
+    def fight_sleep_fail(st):
+        """
+        Провал: персонаж борется со сном, но в итоге засыпает.
+        Глаз медленно закрывается, пытается открыться, но окончательно падает.
+        """
+        if st < 2.0:
+            # Медленное первое закрытие (до 40%)
+            return 1.0 - (st / 2.0) * 0.6
+        elif st < 2.3:
+            # Первая борьба - резкое приоткрытие
+            return 0.4 + ((st - 2.0) / 0.3) * 0.4
+        elif st < 2.6:
+            # Снова закрывается
+            return 0.8 - ((st - 2.3) / 0.3) * 0.5
+        elif st < 5.1:
+            # Медленное засыпание (до 10%)
+            return 0.3 - ((st - 2.6) / 2.5) * 0.2
+        elif st < 5.3:
+            # Подергивание - попытка проснуться
+            return 0.1 + ((st - 5.1) / 0.2) * 0.2
+        elif st < 5.5:
+            # Снова падает
+            return 0.3 - ((st - 5.3) / 0.2) * 0.25
+        elif st < 8.5:
+            # Финальное засыпание
+            return 0.05 - ((st - 5.5) / 3.0) * 0.05
+        else:
+            return 0.0  # Полностью закрыт - уснул
+
+
+    def fight_sleep_success(st):
+        """
+        Успех: персонаж борется со сном и побеждает.
+        Глаз закрывается, но персонаж резко открывает его и остается бодрым.
+        """
+        if st < 2.0:
+            # Медленное первое закрытие (до 50%)
+            return 1.0 - (st / 2.0) * 0.5
+        elif st < 2.3:
+            # Первая борьба - приоткрытие
+            return 0.5 + ((st - 2.0) / 0.3) * 0.3
+        elif st < 2.6:
+            # Снова клонит в сон
+            return 0.8 - ((st - 2.3) / 0.3) * 0.4
+        elif st < 5.1:
+            # Медленное засыпание (до 15%)
+            return 0.4 - ((st - 2.6) / 2.5) * 0.25
+        elif st < 5.3:
+            # Критический момент - почти уснул
+            return 0.15 + ((st - 5.1) / 0.2) * 0.1
+        elif st < 5.5:
+            # РЕЗКОЕ пробуждение! Испугался что засыпает
+            return 0.25 + ((st - 5.3) / 0.2) * 0.75
+        elif st < 6.0:
+            # Глаз широко открыт (1.0) - проснулся!
+            return 1.0
+        elif st < 6.3:
+            # Легкое моргание (проверка что не спит)
+            return 1.0 - ((st - 6.0) / 0.3) * 0.3
+        elif st < 6.6:
+            # Снова открыт
+            return 0.7 + ((st - 6.3) / 0.3) * 0.3
+        else:
+            return 1.0  # Остается бодрым
+    def smooth_sleep_func(st):
+        if st < 5.0: return 1.0 - (st / 5.0) * 0.7
+        elif st < 10.0: return 0.3 - ((st - 5.0) / 5.0) * 0.2
+        elif st < 13.0: return 0.1 - ((st - 10.0) / 3.0) * 0.1
+        else: return 0.0  # ← ПОЛНОСТЬЮ закрыт
+    
+    def blink_func(st):
+        if st < 0.1: return 1.0 - (st / 0.1) * 0.9
+        elif st < 0.2: return 0.1 + ((st - 0.1) / 0.1) * 0.9
+        else: return 1.0
+    
+    def wake_up_func(st):
+        if st < 0.05: return 0.0 + (st / 0.05) * 1.0  # ← стартуем с 0.0
+        elif st < 0.35: return 0.26 - ((st - 0.05) / 0.1) * 0.15
+        elif st < 0.35: return 0.46 - ((st - 0.05) / 0.1) * 0.07
+        elif st < 0.35: return 0.16 - ((st - 0.05) / 0.1) * 0.2
+        elif st < 0.65: return 0.55 + ((st - 0.15) / 0.1) * 0.1
+        elif st < 0.75: return 0.85 + ((st - 0.15) / 0.1) * 0.05
+        else: return 1.0
+# Засыпание с борьбой со сном
+# Экран: засыпание с борьбой со сном
+# Экран: засыпание с провалом (уснул)
+screen fighting_sleep_fail():
+    zorder 10
+    add At(
+        EllipseEye(fight_sleep_fail)
+    )
+
+# Экран: засыпание с успехом (не уснул)
+screen fighting_sleep_success():
+    zorder 10
+    add At(
+        EllipseEye(fight_sleep_success),
+        wake_up_blur
+    )
+    timer 6.6 action Hide("fighting_sleep_success")
+# Экран: плавное засыпание
+screen smooth_sleep():
+    zorder 5
+    add At(EllipseEye(smooth_sleep_func), wake_up_blur)
+    timer 13.0 action Hide("smooth_sleep")
+
+# Экран: быстрое моргание
+screen blink():
+    zorder 5
+    add At(EllipseEye(blink_func), wake_up_blur)
+    timer 0.3 action Hide("blink")
+
+# Экран: резкое пробуждение
+screen wake_up():
+    timer 0.01 action Hide("fighting_sleep")
+    zorder 5
+    add At(EllipseEye(wake_up_func), wake_up_blur)
+    timer 1 action Hide("wake_up")
+
+# Трансформ для расфокуса (остаётся, его можно применять через At())
+transform wake_up_blur:
+    blur 10
+    alpha 0.8
+    linear 0.3 blur 0
+    linear 0.2 alpha 1.0
+    xoffset 0
+    linear 0.1 xoffset -5
+    linear 0.1 xoffset 5
+    linear 0.1 xoffset -3
+    linear 0.1 xoffset 3
+    linear 0.13 xoffset 0 

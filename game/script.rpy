@@ -2,13 +2,14 @@
     play music barabere
     call screen rhythm_game(rhythm_game)   
 label start:
-    #jump phone
+    jump chapter4
+    $renpy.music.set_volume(0.6, channel="sound")
     window auto False
     scene black with dissolve
     show text "{color=#e67bbd}глава 1\n[chapters[0][0]]{/color}" with Pause(1.5)
     scene black with dissolve
-    scene larsroom with dissolve 
-    show pink zorder 10
+    scene larsroom pink with dissolve
+    $ current_light.value = "pink"
     "когда отец напоследок пожелал тебе удачного дня и положил трубку, ты метнулся в комнату, проверить, не забыл ли чего там"
     show lars normal at move_x_from(-0.2,0.3)
     "ты вытащил из под прикроватного ящика один енергетек (розовый монстр) из своей заначки"
@@ -23,8 +24,8 @@ label start:
     "то, что он там снимал и постил сразу обозначало, кем же являлся твой дружок... ну по крайней мере, как это окружающие должны были видеть и слышать."
     "а окружающие рэп из девятки слышали так, что аж оглохнуть было можно, все, кроме дэйва - он носил эирподсы"
     "ты спустился вниз"
-    scene parking with dissolve 
-    show sunrise zorder 10
+    scene parking sunrise with dissolve
+    $ current_light.value = "sunrise"
     show dave side1 at move_x_from(1.2, 0.6)
     show lars normal at move_x_from(-0.2, 0.45)
     d "салам алейкум"
@@ -35,8 +36,7 @@ label start:
     l "нахуя тебе сапбуфер в багажнике?"
     d "люблю когда что-то большое долбит сзади"
     "дйв закрыл ключом свой чертолет и зашёл на территорию участка"
-    scene nearhouse with dissolve 
-    show sunrise zorder 10
+    scene nearhouse sunrise with dissolve 
     show dave think at move_x_from (-0.2, 0.4)
     show lars normal at move_x_from (-0.2, 0.25)
     l "знаешь брад о чем я мечтаю?"
@@ -70,8 +70,7 @@ label start:
     show lars normal with dissolve 
     l "а сейчас пиздуем"
     l "время видел?"
-    hide sunrise
-    show day_sun zorder 10
+    $ current_light.value = "sunlight"
     d "да я ща за минуту твою мечту заспидраню в машину залазий"
     show lars irritated with dissolve 
     l "нахуя мне минута осел блять"
@@ -113,9 +112,8 @@ label start:
     l "я тоже тебя люблю"
     l "а теперь побежали"
     scene street with dissolve 
-    show day_sun zorder 10
     show dave think at my_left with dissolve 
-    show lars normal with dissolve 
+    show lars normal at center with dissolve 
     d "сука я снюс в тачке забыл ща метнусь быстро"
     show dave side1 with dissolve 
     show lars angry with dissolve 
@@ -132,13 +130,13 @@ label start:
     l "вот специально для тебя чапман и таскаю с собой!"
     l "на блять подавись"
     d "от души брат"
-    "ты тоже достал сигареты, только нормальные"
+    "ты тоже достал сигареты, только вкусные - аж с двумя кнопопочками"
     "вы с кайфом закурили, и, пуская дым на всю улицу, пошли куда вас вёл навигатор"
     "к тернистой и ухабистой тропе познания"
     "на учёбу, короче"
     show screen smoke
     scene classroom
-    show electric zorder 10
+    $ current_light.value = "classroom_cold"
     show dave think zorder 2 at move_x_from (-0.2, 0.4)
     show lars normal zorder 2 at move_x_from (-0.2, 0.25)
     "зайдя в класс, ты выпустил облако дыма после только что сделанной затяжки эльфбара"
@@ -252,7 +250,7 @@ label lars_zanuda:
     k "я кирк"
     show lars normal with dissolve 
     l "я ларс хуй в очо тебе кирк"
-    k "интеграл хуев с бесконечными интервалами тебе в очо ларс"
+    k "интеграл хуев от бесконечно малого интервала тебе в очо ларс"
     $kirk_rel += 1
     $renpy.notify("знакомство удалось! кирк теперь твой бро")
     show nick smile with dissolve 
@@ -359,7 +357,7 @@ label sc:
     show dave sad with dissolve
     d "ну..."
     show dave think with dissolve
-    d "режим определяется некоторым напряжением тока то есть одна микросхема и пара резисторов уже всё дело решает не нужен там код"
+    d "режим определяется некоторым напряжением тока то есть одна микросхема и пара транзисторов уже всё дело решает не нужен там код"
     show lars please with dissolve
     l "хуя ты электрик"
     show james smile with dissolve

@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script2.rpy", line 1607: Line is followed by a block, despite not being a menu choice. Did you forget a colon at the end of the line?
-    "сам сожру вкусно же пиздец"
-                                ^
+File "game/fever.rpy", line 188: ATL statement contains two expressions in a row; is one of them a misspelled property? If not, separate them with pass.
+    update True
+               ^
 
-Ren'Py Version: Ren'Py 8.3.7.25031702
-Sat Aug  1 13:13:48 2026
+Ren'Py Version: Ren'Py 8.5.3.26051504
+Sun Oct 18 03:03:45 2026

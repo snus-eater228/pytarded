@@ -51,7 +51,7 @@ define gui.insensitive_color = '#7070707f'
 
 ## Цвета, используемые для частей панелей, которые не заполняются. Они
 ## используются не напрямую, а только при воссоздании файлов изображений.
-define gui.muted_color = '#e066a3'
+define gui.muted_color = '#66a9e0'
 define gui.hover_muted_color = '#ea99c1'
 
 ## Цвета, используемые в тексте диалогов и выборов.
@@ -63,6 +63,7 @@ define gui.interface_text_color = '#404040'
 
 ## Шрифт, используемый внутриигровым текстом.
 define gui.text_font = "gui/inglobal.ttf"
+
 
 ## Шрифт, используемый именами персонажей.
 define gui.name_text_font = "gui/Veles.ttf"
@@ -103,6 +104,7 @@ define gui.game_menu_background = "gui/game_menu.png"
 
 ## Высота текстового окна, содержащего диалог.
 define gui.textbox_height = 0
+define gui.textbox_zorder = 100
 
 ## Местоположение текстового окна по вертикали экрана. 0.0 — верх, 0.5 — центр и
 ## 1.0 — низ.
@@ -321,9 +323,9 @@ define gui.frame_tile = False
 
 ## Высота горизонтальных панелей, полос прокрутки и ползунков. Ширина
 ## вертикальных панелей, полос прокрутки и ползунков.
-define gui.bar_size = 38
-define gui.scrollbar_size = 18
-define gui.slider_size = 38
+define gui.bar_size = 8
+define gui.scrollbar_size = 8
+define gui.slider_size = 4
 
 ## True, если изображения панелей должны моститься. False, если они должны быть
 ## линейно масштабированы.

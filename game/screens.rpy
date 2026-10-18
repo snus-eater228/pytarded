@@ -165,7 +165,7 @@ transform text_fade_in:
 
 screen say(who, what):
     style_prefix "say"
-
+    zorder 100
     window:
         at say_window_animation
         id "window"
@@ -204,7 +204,6 @@ style namebox_label is say_label
 
 style window:
     xalign 0.5
-    
     xfill True
     yalign gui.textbox_yalign
     ysize gui.textbox_height
@@ -232,7 +231,6 @@ style say_dialogue:
     xpos gui.dialogue_xpos
     xsize gui.dialogue_width
     ypos gui.dialogue_ypos
-
     adjust_spacing False
 
 ## Экран ввода #################################################################
@@ -683,12 +681,9 @@ style navigation_button_text:
 ## https://www.renpy.org/doc/html/screen_special.html#main-menu
 
 screen main_menu():
-
-    tag menu
-
+    #tag menu
     style_prefix "main_menu"
-
-    use main_menu_animation()
+    use xp_main_menu()
 
 
 style main_menu_frame is empty
@@ -697,18 +692,20 @@ style main_menu_text is gui_text
 style main_menu_title is main_menu_text
 style main_menu_version is main_menu_text
 
-style main_menu_frame:
-    xsize 420
-    yfill True
+style main_menu_font:
+    properties gui.text_properties("menu")
+# style main_menu_frame:
+#     xsize 420
+#     yfill True
 
-    background "gui/overlay/main_menu.png"
+#     background "gui/overlay/main_menu.png"
 
-style main_menu_vbox:
-    xalign 1.0
-    xoffset -30
-    xmaximum 1200
-    yalign 1.0
-    yoffset -30
+# style main_menu_vbox:
+#     xalign 1.0
+#     xoffset -30
+#     xmaximum 1200
+#     yalign 1.0
+#     yoffset -30
 
 style main_menu_text:
     properties gui.text_properties("main_menu", accent=True)
@@ -718,6 +715,8 @@ style main_menu_title:
 
 style main_menu_version:
     properties gui.text_properties("version")
+
+
 
 
 ## Экран игрового меню #########################################################
@@ -2138,3 +2137,32 @@ screen ls(items):
                 action Hide("ls")
                 xpos 5
                 bottom_margin 5
+
+# ЭКРАН РИКРОЛЛА
+screen rickroll():
+    zorder 100      # Гарантирует, что экран будет ПОВЕРХ всего (даже поверх браузера)
+    modal True      # Блокирует клики по нижним слоям, пока открыто видео
+    
+    # Полупрозрачное затемнение фона для фокуса на видео (опционально)
+    add "#000000cc" xysize (1.0, 1.0)
+
+    # Контейнер для видео и кнопки закрытия
+    fixed:
+        xalign 0.5
+        yalign 0.5
+        
+        # Проигрывание видео внутри экрана.
+        # ВАЖНО: Укажи здесь реальный путь к твоему видеофайлу (например, "gui/xp_menu/rickroll.webm")
+        add Movie(play="gui/xp_menu/rickroll.webm", loop=True, xsize=642, ysize=361) xalign 0.58 yalign 0.62
+        
+        # Кнопка закрытия (справа сверху от видео)
+        imagebutton:
+            idle "close"        # ЗАМЕНИ на имя твоего файла (например, "close")
+            hover "close_hover" # ЗАМЕНИ на имя твоего файла (например, "close_hover")
+            action [
+                Stop("movie"), # КРИТИЧЕСКИ ВАЖНО: останавливает видео и звук при закрытии!
+                Hide("rickroll")
+            ]
+            # Позиционируем кнопку чуть выше и правее верхнего правого угла видео
+            xalign 0.71
+            yalign 0.37
