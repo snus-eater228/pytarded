@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/fever.rpy", line 188: ATL statement contains two expressions in a row; is one of them a misspelled property? If not, separate them with pass.
-    update True
-               ^
+File "game/auto-highlight.rpy", line 227: expected an indented block after function definition on line 137
+    """Возвращает список (tag, name) для всех показанных на слое."""
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ren'Py Version: Ren'Py 8.5.3.26051504
-Sun Oct 18 03:03:45 2026
+Thu Oct 22 15:03:25 2026

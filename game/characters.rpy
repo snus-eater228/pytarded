@@ -1,5 +1,5 @@
 define james_zoom__koef = 0.79
-define dave_zoom_koef = 0.885
+define dave_zoom_koef = 0.77
 define lars_zoom__koef = 0.8
 define kirk_zoom_koef = 0.72
 define nick_zoom__koef = 0.7
@@ -8,51 +8,51 @@ define girl_zoom_koef = 0.7
 image dave think = At('dave think demo', sprite_highlight('dave'))
 image dave think demo:
     zoom dave_zoom_koef
-    "images/dave think.png"
+    "images/dave new.png"
 image dave side1 = At('dave side1 demo', sprite_highlight('dave'))
 image dave side1 demo:
     zoom dave_zoom_koef
-    "images/dave side1.png"
+    "images/dave new.png"
 image dave side2 = At('dave side2 demo', sprite_highlight('dave'))
 image dave side2 demo:
     zoom dave_zoom_koef
-    "images/dave side2.png"
+    "images/dave new.png"
 image dave angry = At('dave angry demo', sprite_highlight('dave'))
 image dave angry demo:
-    zoom 0.88
-    "images/dave angry.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave sad = At('dave sad demo', sprite_highlight('dave'))
 image dave sad demo:
     zoom dave_zoom_koef
-    "images/dave sad.png"
+    "images/dave new.png"
 image dave smile = At('dave smile demo', sprite_highlight('dave'))
 image dave smile demo:
-    zoom 0.9
-    "images/dave smile.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave pink normal = At('dave pink normal demo', sprite_highlight('dave'))
 image dave pink normal demo:
-    zoom 0.78
-    "images/dave pink normal.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave pink smile = At('dave pink smile demo', sprite_highlight('dave'))
 image dave pink smile demo:
-    zoom 0.76
-    "images/dave pink smile.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave pink sad = At('dave pink sad demo', sprite_highlight('dave'))
 image dave pink sad demo:
-    zoom 0.71
-    "images/dave pink sad.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave pink happy = At('dave pink happy demo', sprite_highlight('dave'))
 image dave pink happy demo:
-    zoom 0.73
-    At("images/dave pink happy.png", flip)
+    zoom dave_zoom_koef
+    At("images/dave new.png", flip)
 image dave blue normal = At('dave blue normal demo', sprite_highlight('dave'))
 image dave blue normal demo:
-    zoom 0.86
-    "images/dave blue normal.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 image dave blue irritated = At('dave blue irritated demo', sprite_highlight('dave'))
 image dave blue irritated demo:
-    zoom 0.87
-    "images/dave blue irritated.png"
+    zoom dave_zoom_koef
+    "images/dave new.png"
 
 image james blush = At("james blush demo", sprite_highlight('james'))
 image james blush demo:
@@ -73,11 +73,11 @@ image james sad demo:
 image james naked normal = At("james naked normal demo", sprite_highlight('james'))
 image james naked normal demo:
     "images/james naked normal.png"
-    zoom 0.89
+    zoom james_zoom__koef
 image james naked blush = At("james naked blush demo", sprite_highlight('james'))
 image james naked blush demo:
     "images/james naked blush.png"
-    zoom 0.89
+    zoom james_zoom__koef
 
 image lars blush naked = At("lars blush naked demo", sprite_highlight('lars'))
 image lars blush naked demo:
@@ -85,50 +85,51 @@ image lars blush naked demo:
     zoom lars_zoom__koef
 image lars angry = At("lars angry demo", sprite_highlight('lars'))
 image lars angry demo:
-    "images/lars angry.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars cow greeting = At("lars cow greeting demo", sprite_highlight('lars'))
 image lars cow greeting demo:
-    "images/lars cow greeting.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars please = At("lars please demo", sprite_highlight('lars'))
 image lars please demo:
-    "images/lars please.png"
+    "images/lars new.png"
+    zoom lars_zoom__koef
 image lars test = At("lars test demo", sprite_highlight('lars'))
 image lars test demo:
-    "images/lars test.png"
+    "images/lars new.png"
     zoom 2
 image lars cow offense = At("lars cow offense demo", sprite_highlight('lars'))
 image lars cow offense demo:
-    "images/lars cow offense.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars normal = At("lars normal demo", sprite_highlight('lars'))
 image lars normal demo:
-    "images/lars normal.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars happy naked = At("lars happy naked demo", sprite_highlight('lars'))
 image lars happy naked demo:
-    "images/lars happy naked.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars irritated = At("lars irritated demo", sprite_highlight('lars'))
 image lars irritated demo:
-    "images/lars irritated.png"
-    zoom 0.79
+    "images/lars new.png"
+    zoom lars_zoom__koef
 image lars blush naked = At("lars blush naked demo", sprite_highlight('lars'))
 image lars blush naked demo:
-    "images/lars blush naked.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars smile = At("lars smile demo", sprite_highlight('lars'))
 image lars smile demo:
-    "images/lars smile.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars sad = At("lars sad demo", sprite_highlight('lars'))
 image lars sad demo:
-    "images/lars sad.png"
+    "images/lars new.png"
     zoom lars_zoom__koef
 image lars yellow demo:
-    "images/lars yellow.png"
-    zoom 0.85
+    "images/lars new.png"
+    zoom lars_zoom__koef
 image lars yellow = At("lars yellow demo", sprite_highlight('lars'))
 
 image nick sad = At("nick sad demo", sprite_highlight('nick'))

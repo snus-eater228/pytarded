@@ -1,32 +1,128 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While running game code:
-  File "game/shaders.rpy", line 180, in execute_default
-    default fever_intensity = 0.5
-Exception: store.fever_intensity is being given a default a second time.
+Executing ATL code at game/auto-highlight.rpy:88
+  File "game/script.rpy", line 27, in script
+    l "пускай ваше утро начинается с 32 банок ред булла"
+  File "renpy/display/render.pyx", line 494, in renpy.display.render.render_screen
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/accelerator.pyx", line 1020, in renpy.display.accelerator.RenderTransform.render
+  File "renpy/display/accelerator.pyx", line 439, in renpy.display.accelerator.RenderTransform.render_child
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "game/auto-highlight.rpy", line 207, in __call__
+    trans.zofset += 10
+    ^^^^^^^^^^^^      
+AttributeError: 'ATLTransform' object has no attribute 'zofset'. Did you mean: 'offset'?
 
 -- Full Traceback ------------------------------------------------------------
 
 Traceback (most recent call last):
-  File "renpy/common/00start.rpy", line 210, in script
-    python:
-  File "renpy/ast.py", line 1193, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/python.py", line 1276, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/common/00start.rpy", line 211, in <module>
-    renpy.execute_default_statement(True)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
-  File "renpy/exports/statementexports.py", line 368, in execute_default_statement
-    i.execute_default(start)
-    ~~~~~~~~~~~~~~~~~^^^^^^^
-  File "game/shaders.rpy", line 180, in execute_default
-    default fever_intensity = 0.5
-Exception: store.fever_intensity is being given a default a second time.
+  File "game/script.rpy", line 27, in script
+    l "пускай ваше утро начинается с 32 банок ред булла"
+  File "renpy/ast.py", line 2935, in execute
+    Say.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "renpy/ast.py", line 994, in execute
+    renpy.exports.say(who, what, *args, **kwargs)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/exports/sayexports.py", line 129, in say
+    who(what, *args, **kwargs)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/character.py", line 1565, in __call__
+    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/character.py", line 1220, in do_display
+    display_say(who, what, self.do_show, **display_args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/character.py", line 902, in display_say
+    rv = renpy.ui.interact(mouse="say", type=type, roll_forward=roll_forward)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/ui.py", line 306, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/core.py", line 2163, in interact
+    repeat, rv = self.interact_core(
+                 ~~~~~~~~~~~~~~~~~~^
+        preloads=preloads,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "renpy/display/core.py", line 2842, in interact_core
+    self.draw_screen(root_widget, fullscreen_video, (not fullscreen_video) or video_frame_drawn)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/core.py", line 1279, in draw_screen
+    surftree = renpy.display.render.render_screen(
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        root_widget,
+        ^^^^^^^^^^^^
+        renpy.config.screen_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        renpy.config.screen_height,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "renpy/display/render.pyx", line 494, in renpy.display.render.render_screen
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/layout.py", line 896, in render
+    surf = render(child, width, height, cst, cat)
+           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/layout.py", line 896, in render
+    surf = render(child, width, height, cst, cat)
+           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/layout.py", line 896, in render
+    surf = render(child, width, height, cst, cat)
+           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/transform.py", line 1093, in render
+    return RenderTransform(self).render(width, height, st, at)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/accelerator.pyx", line 1020, in renpy.display.accelerator.RenderTransform.render
+  File "renpy/display/accelerator.pyx", line 439, in renpy.display.accelerator.RenderTransform.render_child
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/image.py", line 532, in render
+    return wrap_render(self.target, width, height, st, at)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/image.py", line 307, in wrap_render
+    rend = render(child, w, h, st, at)
+           ~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/render.pyx", line 170, in renpy.display.render.render
+  File "renpy/display/render.pyx", line 267, in renpy.display.render.render
+  File "renpy/display/transform.py", line 1091, in render
+    self.update_state()
+    ~~~~~~~~~~~~~~~~~^^
+  File "renpy/display/transform.py", line 1271, in update_state
+    fr = self.execute(self, fst, fat)
+         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "renpy/atl.py", line 721, in execute
+    action, arg, pause = block.execute(trans, timebase, self.atl_state, events)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/atl.py", line 962, in execute
+    action, arg, pause = stmt.execute(trans, target - start, child_state, events)
+                         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/atl.py", line 2026, in execute
+    fr = self.function(trans, st if block else 0, trans.at)
+         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "game/auto-highlight.rpy", line 207, in __call__
+    trans.zofset += 10
+    ^^^^^^^^^^^^      
+AttributeError: 'ATLTransform' object has no attribute 'zofset'. Did you mean: 'offset'?
 
 macOS-26.6.2-arm64-arm-64bit arm64
 Ren'Py 8.5.3.26051504
 pytarded 1.0
-Sun Oct 18 03:57:44 2026
+Thu Oct 22 14:48:56 2026

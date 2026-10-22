@@ -23,7 +23,6 @@ default dz_1 = False
 
 default angry_phrases = ["код говна!!", "блять!", "работай же чучело!", "кто это писал погромист ущербный", "ненавижу((("]
 
-default rhythm_game = RhythmGame()
 default ls = ""
 
 default persistent.gallery = None
@@ -44,3 +43,4 @@ default chapters = [
 ]
 
 default persistent.progress = "1"
+default rhythm_game = None

@@ -1,8 +1,4 @@
-﻿label start_bere:
-    play music barabere
-    call screen rhythm_game(rhythm_game)   
-label start:
-    jump chapter4
+﻿label start:
     $renpy.music.set_volume(0.6, channel="sound")
     window auto False
     scene black with dissolve
@@ -14,6 +10,20 @@ label start:
     show lars normal at move_x_from(-0.2,0.3)
     "ты вытащил из под прикроватного ящика один енергетек (розовый монстр) из своей заначки"
     show lars smile with dissolve 
+    # $ start_facetime("dave", "think", "club", "bright_blue")
+    # d "больше сюда не пиши от тебя гавной ваняет атсуда телефона чувствую"
+    # $ trigger_heavy_glitch()
+    # l "ты че с тапочка звонишь"
+    # show dave sad with dissolve
+    # d "я под мефом"
+    # l "ахахаха удивил а я под лсд дура"
+    # $ renpy.layer_at_list([buzz_strong], layer='master')
+    # d "где я"
+    # $ trigger_heavy_glitch()
+    # l "неважно но вот где блять я"
+    # show dave smile with dissolve
+    # d "пока фуфел"
+    # $ end_facetime()
     l "пускай ваше утро начинается с 32 банок ред булла"
     l "а у этого чёрта пусть оно начинается с кофейной клизмы сука"
     show lars angry with dissolve 
@@ -134,12 +144,12 @@ label start:
     "вы с кайфом закурили, и, пуская дым на всю улицу, пошли куда вас вёл навигатор"
     "к тернистой и ухабистой тропе познания"
     "на учёбу, короче"
-    show screen smoke
     scene classroom
     $ current_light.value = "classroom_cold"
     show dave think zorder 2 at move_x_from (-0.2, 0.4)
     show lars normal zorder 2 at move_x_from (-0.2, 0.25)
     "зайдя в класс, ты выпустил облако дыма после только что сделанной затяжки эльфбара"
+    $ renpy.layer_at_list([vape_puff], layer='master')
     "препода, к счастью, не было - вы пришли заранее"
     "и не успели вы усадить свои жопы, как сразу попали в центр внимания"
     show nick side zorder 2 at move_x_from(1.2, 0.5)
@@ -321,6 +331,7 @@ label sc:
     "дэйв опустил глаза в пол"
     "он стопроцентно собрался паясничать и срывать урок, но отчего-то смутился, подумал ты"
     "впрочем, оказавшись ближе к полу, рыжий нагнулся к твоей сумке, выхватил бесцеремонно твой вейп и затянулся под партой"
+    $ renpy.layer_at_list([vape_puff], layer='master')
     show james sad with dissolve
     j "есть правила(("
     j "давайте договоримся их соблюдать и все будем счастливы"
@@ -779,7 +790,7 @@ label pr:
     j "я этих программ уже до одного места написал"
     show james sad with dissolve
     j "только счастье не в этом"
-    "ты настколько заботливо, насколько мог посмотрел на джеймса, и он, к счастью, тут же улыбнулся в ответ"
+    "ты настолько заботливо, насколько мог посмотрел на джеймса, и он, к счастью, тут же улыбнулся в ответ"
     $james_rel += 1
     show james normal with dissolve
     j "ладно, что-то мы отвлеклись. садись, продолжим нашу тему"
@@ -1176,9 +1187,9 @@ label continue_urok:
     show dave think with dissolve
     d "эй никуся нитакуся не поделишься ли снюсей)"
     n "для свой брад ничего не жалко храни тебя алл*х брад"
-    show screen smoke
+    $ renpy.layer_at_list([vape_puff], layer='master')
     scene schoolground
-    show day_sun zorder 20
+    $ current_light.value = "sunlight"
     "попинав мяч на перемене вы приняли волевое решение свалить с английского и разговоров о важном"
     "чё там важного можно сказать?"
     "вот джеймс важный он питонщик"
@@ -1197,14 +1208,13 @@ label continue_urok:
     l "я домашку делать буду и тебя еще заставлю"
     show dave angry with dissolve
     d "тьфу ты из-за тебя от чарончика гариком несёт"
-    show screen smoke
+    $ renpy.layer_at_list([vape_puff], layer='master')
     scene college_a
-    show day_sun zorder 20
     show dave side1 at move_x_from(1.2, 0.6)
     show lars normal at move_x_from(-0.2, 0.45)
     "вы могли заскочить в магазин за школой однако дйв болтая о тюнинге девятки тебя тащил дальше по улице"
     scene store
-    show shop zorder 20
+    $ current_light.value = "bright_blue"
     show gerard side at right
     show dave smile at move_x_from(1.2, 0.6)
     show lars normal at move_x_from(-0.2, 0.45)
@@ -1257,7 +1267,7 @@ label continue_urok:
     show lars normal at move_x(-0.2)
     "рыжий тут же подскочил и рванул к выходу а ты поняв затею дал заднюю вслед за ним"
     scene road with dissolve
-    show day_sun zorder 20
+    $ current_light.value = "sunlight"
     show dave side2 at move_x_from(-1.2, 0.3)
     show lars normal at move_x_from(-0.8, 0.45)
     "из кармана дэйв вытащил стеклянный код той злополучной бутылки ценой в зарплату бедолаги"
@@ -1298,8 +1308,6 @@ label posh:
     show lars please with dissolve
     l "мне только не пизди что оно случайно так вышло идем ко мне лучше"
     scene street_day
-    show day_sun zorder 10
-
     show dave side2 at move_x_from(-0.2, 0.6)
     "довольный своей выходкой, твой друг бодро шагал впереди."
     show dave smile with dissolve
@@ -1353,7 +1361,7 @@ label posh:
     show lars normal at move_x_from(-0.3, 0.45)
     "дома было пусто - никто не мешал вам засесть на кухне за долгожданным отдыхом."
     scene livingroom
-    show balls zorder 20
+    $ current_light.value = "normal"
     show dave think at move_x_from(-0.2, 0.6)
     show lars smile at move_x_from(-0.3, 0.45)
     "не разделяя твоего энтузиазма по поводу хором дэйв зашел и плюхнулся на стул"

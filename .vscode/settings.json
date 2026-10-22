@@ -183,8 +183,50 @@
                 "settings": {
                     "foreground": "#e67bbd"
                 }
+            },
+            {
+                "scope": "renpy.meta.color.#8b00ff",
+                "settings": {
+                    "foreground": "#8b00ff"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#4b0082",
+                "settings": {
+                    "foreground": "#4b0082"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#00f",
+                "settings": {
+                    "foreground": "#00f"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#0f0",
+                "settings": {
+                    "foreground": "#0f0"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#ff0",
+                "settings": {
+                    "foreground": "#ff0"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#ff7f00",
+                "settings": {
+                    "foreground": "#ff7f00"
+                }
+            },
+            {
+                "scope": "renpy.meta.color.#f00",
+                "settings": {
+                    "foreground": "#f00"
+                }
             }
         ]
     },
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5502
 }

@@ -22,6 +22,10 @@ image green_kitchen:
     blend "multiply"
     alpha 0.7
 
+image club:
+    "images/club.png"
+    zoom 1.5
+
 image gym_light:
     "images/light/gym_light.png"
     blend "add"

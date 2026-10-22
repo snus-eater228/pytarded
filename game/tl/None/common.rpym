@@ -475,19 +475,19 @@ translate None strings:
 
     # renpy/common/00gui.rpy:448
     old "Are you sure?"
-    new "Вы уверены?"
+    new "Вы девственник?"
 
     # renpy/common/00gui.rpy:449
     old "Are you sure you want to delete this save?"
-    new "Вы уверены, что хотите удалить это сохранение?"
+    new "Че прям не нужно? Удаляем?"
 
     # renpy/common/00gui.rpy:450
     old "Are you sure you want to overwrite your save?"
-    new "Вы уверены, что хотите перезаписать ваше сохранение?"
+    new "Сохранение будет переписано(а история половых партнеров нет лол). Газ?"
 
     # renpy/common/00gui.rpy:451
     old "Loading will lose unsaved progress.\nAre you sure you want to do this?"
-    new "Загрузка игры приведёт к потере несохранённого прогресса.\nВы уверены, что хотите это сделать?"
+    new "Текущий прогресс будет утерян как презик в жопе Ларса. Хотим?"
 
     # renpy/common/00gui.rpy:452
     old "Are you sure you want to quit?"
@@ -495,7 +495,7 @@ translate None strings:
 
     # renpy/common/00gui.rpy:453
     old "Are you sure you want to return to the main menu?\nThis will lose unsaved progress."
-    new "Вы уверены, что хотите вернуться в главное меню?\nЭто приведёт к потере несохранённого прогресса."
+    new "После возврата в меню прогресс будет просран! Так что, газ?"
 
     # renpy/common/00gui.rpy:454
     old "Are you sure you want to continue where you left off?"

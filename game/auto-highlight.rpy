@@ -97,13 +97,16 @@ init -10 python:
     # name: Name of the character talking at present. Usually a string.
     #       Used by SpriteFocus's __call__ function to determine which sprites to put in talking and non-talking states
     def name_callback(event, interact=True, name=None, **kwargs):
-        
         global speaking_char
         if event == "begin":
             speaking_char = name
+            _update_sprite_zorders(name)
+            renpy.restart_interaction()
         elif event == "end":
             for char in sprite_focus.keys():
                 sprite_focus[char] = False
+                _update_sprite_zorders(None)
+                renpy.restart_interaction()
 
             
     def switch_mode(event, interact=True, name=None, **kwargs):
@@ -213,3 +216,64 @@ init -10 python:
             # Returning > 0 will cause it to redraw slower. And returning None will cause it to stop running
             return 0
 
+    # === ZORDER ДЛЯ АВТО-ПОДСВЕТКИ ===
+    # Говорящий персонаж получает высокий zorder, молчащие — низкий.
+    # Использует внутренний API SceneList.set_zorder, чтобы не перерисовывать
+    # спрайт (и не сбрасывать анимацию sprite_highlight).
+
+       # === ZORDER ДЛЯ АВТО-ПОДСВЕТКИ (через behind) ===
+
+    def _get_shown_tags_on_layer(layer='master'):
+        """Возвращает список тегов, показанных на слое в данный момент."""
+        try:
+            sl = renpy.game.context().scene_lists
+            if not hasattr(sl, 'layers'):
+                return []
+            entries = sl.layers.get(layer, [])
+            tags = []
+            for entry in entries:
+                tag = getattr(entry, 'tag', None)
+                if tag is not None:
+                    tags.append(tag)
+            return tags
+        except Exception:
+            return []
+
+    def _update_sprite_zorders(speaking_tag):
+        """Переставляет спрайты через renpy.show() с behind=.
+        speaking_tag — тег говорящего (или None, если говорит narrator)."""
+        # Получаем все теги на master слое
+        shown = _get_shown_tags_on_layer('master')
+        if not shown:
+            return
+
+        # Только спрайты, на которых навешен sprite_highlight
+        our_tags = [t for t in shown if t in sprite_focus]
+        if not our_tags:
+            return
+
+        if speaking_tag is None or speaking_tag not in our_tags:
+            # Никто не говорит (narrator) — все на одном уровне.
+            # Используем behind между ними, чтобы порядок остался стабильным:
+            # первый — позади остальных, второй — позади всех кроме первого, и т.д.
+            # Простейший способ — показать их в исходном порядке без behind.
+            for tag in our_tags:
+                try:
+                    renpy.show(tag, behind=[])
+                except Exception:
+                    pass
+        else:
+            # Говорящий — спереди всех. Для этого показываем остальных "позади" него.
+            for tag in our_tags:
+                if tag == speaking_tag:
+                    # Говорящего показываем без behind — он будет спереди
+                    try:
+                        renpy.show(tag, behind=[])
+                    except Exception:
+                        pass
+                else:
+                    # Остальных — позади говорящего
+                    try:
+                        renpy.show(tag, behind=[speaking_tag])
+                    except Exception:
+                        pass

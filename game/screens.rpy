@@ -537,7 +537,7 @@ screen snus_pack():
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
         action QuickSave()
     
-    text "магнит\n(б.сохр)":
+    text "выплюнуть\n(в меню)":
         font "gui/Veles.ttf"
         size 18
         pos (125,335)
@@ -553,44 +553,45 @@ screen snus_pack():
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
         action QuickLoad()
     
-    text "быстрый вкид\n(б.загр)":
+    text "закладка\n(qr код)":
         font "gui/Veles.ttf"
         size 18
-        pos (235,215)
+        pos (235,245)
         at rot2(ql_rot)
         color "#000"
 
 screen quick_menu():
-    zorder 100
-    
-    # Основная кнопка снюса
-    imagebutton:
-        ypos -400
-        idle get_snus(is_opened, is_hovered)
-        hover get_snus(is_opened, is_hovered)
-        at slide_in_out(is_hovered)
+    if not rhythm_game or not rhythm_game.is_playing:
+        zorder 100
         
-        hovered [
-            SetVariable("is_hovered", True),
-            If(not is_selected, NullAction())
-        ]
-        unhovered [SetVariable("is_hovered", False), SetVariable("is_opened", False)]
+        # Основная кнопка снюса
+        imagebutton:
+            ypos -400
+            idle get_snus(is_opened, is_hovered)
+            hover get_snus(is_opened, is_hovered)
+            at slide_in_out(is_hovered)
+            
+            hovered [
+                SetVariable("is_hovered", True),
+                If(not is_selected, NullAction())
+            ]
+            unhovered [SetVariable("is_hovered", False), SetVariable("is_opened", False)]
+            
+            action [
+                If(not is_selected, 
+                    SetVariable("is_selected", True),
+                    [SetVariable("is_opened", True), NullAction()]
+                )
+            ]
         
-        action [
-            If(not is_selected, 
-                SetVariable("is_selected", True),
-                [SetVariable("is_opened", True), NullAction()]
-            )
-        ]
-    
-    # Показываем рекламу при наведении (если не открыто)
-    if is_hovered and not is_opened:
-        use snus_ad()
+        # Показываем рекламу при наведении (если не открыто)
+        if is_hovered and not is_opened:
+            use snus_ad()
+            
+        # Показываем содержимое при открытии
+        if is_opened:
+            use snus_pack()
         
-    # Показываем содержимое при открытии
-    if is_opened:
-        use snus_pack()
-    
 ## Данный код гарантирует, что экран быстрого меню будет показан в игре в любое
 ## время, если только игрок не скроет интерфейс.
 init python:
@@ -1461,7 +1462,8 @@ screen confirm(message, yes_action, no_action):
 
     ## Гарантирует, что другие экраны будут недоступны, пока показан этот экран.
     modal True
-
+    if rhythm_game:
+        $ rhythm_game.stop()
     zorder 200
 
     style_prefix "confirm"
@@ -1483,8 +1485,8 @@ screen confirm(message, yes_action, no_action):
                 xalign 0.5
                 spacing 150
 
-                textbutton _("Да") action yes_action
-                textbutton _("Нет") action no_action
+                textbutton _("Бурмалда") action yes_action
+                textbutton _("Не бурмалда") action no_action
 
     ## Правый клик и esc, как ответ "Нет".
     key "game_menu" action no_action

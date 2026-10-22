@@ -7,6 +7,11 @@ transform move_x_from(f, x, speed = 0.5):
     xalign f
     linear speed xalign x
 
+transform dance_floor:
+    xalign 0.25
+    yalign 0.4
+    zoom 0.5
+
 transform my_left:
     xalign 0.33
     yalign 1.0

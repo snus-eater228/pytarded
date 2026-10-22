@@ -8,7 +8,7 @@ init python:
         "normal": Matrix((1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
         
         # Розовый - мягкий, не агрессивный
-        "pink": Matrix((1.1, 0.3, 0.0, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 1.05, 0.0, 0.0, 0.0, 0.0, 1.0)),
+        "pink": Matrix((1.0, 0.3, 0.0, 0.0, 0.0, 0.6, 0.0, 0.0, 0.0, 0.0, 0.9, 0.0, 0.0, 0.0, 0.0, 0.9)),
     
         # Ночь - темнее, но не прозрачный
         "night": Matrix((0.5, 0.0, 0.0, 0.0, 0.0, 0.6, 0.0, 0.0, 0.0, 0.0, 0.85, 0.0, 0.0, 0.0, 0.0, 1.0)),
@@ -191,11 +191,47 @@ init -1 python:
         if isinstance(name, tuple) or isinstance(name, list):
             return name[0]
         return name
+
+    def _get_emotion(name):
+        """Извлекает эмоцию из name (может быть строкой или кортежем)"""
+        if isinstance(name, tuple):
+            if len(name) > 1:
+                return name[1]
+        elif isinstance(name, str):
+            parts = name.split()
+            if len(parts) > 1:
+                return parts[1]
+        return "normal"
     
     def custom_show(name, what=None, at_list=None, zorder=0, behind=None, layer='master', atl=None, **kwargs):
-        """Перехватчик show с автоматическим освещением и сплющиванием списков"""
         tag = _get_tag(name)
         
+        # ==========================================
+        # ОБНОВЛЕНИЕ ЭМОЦИИ ДЛЯ FACETIME
+        # ==========================================
+        if store.is_facetime and tag == store.facetime_caller:
+            # Пытаемся получить эмоцию из разных источников
+            emotion = None
+            
+            # 1. Проверяем name (может быть кортежем ("james", "sad"))
+            emotion = _get_emotion(name)
+            
+            # 2. Если не нашли, проверяем what
+            if not emotion and what and isinstance(what, str):
+                parts = what.split()
+                if len(parts) > 1:
+                    emotion = parts[1]
+            
+            # 3. Если все еще нет, сбрасываем на normal
+            if not emotion:
+                emotion = "normal"
+            
+            # Обновляем переменную
+            store.facetime_emotion = emotion
+            
+            # Перерисовываем экран телефона
+            renpy.restart_interaction()
+            return
         if tag in ALL_CHARACTERS:
             # Получаем объект трансформации освещения
             lighting_transform = getattr(
@@ -218,17 +254,6 @@ init -1 python:
                 flat_at_list.append(lighting_transform)
                 at_list = flat_at_list
         
-        # Вызываем оригинал
-        _original_config_show(
-            name, 
-            what=what, 
-            at_list=at_list, 
-            zorder=zorder, 
-            behind=behind, 
-            layer=layer, 
-            atl=atl,
-            **kwargs
-        )
+        _original_config_show(name, what=what, at_list=at_list, zorder=zorder, behind=behind, layer=layer, atl=atl, **kwargs)
     
-    # Подменяем config.show
     renpy.config.show = custom_show
