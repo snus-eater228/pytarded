@@ -1,11 +1,13 @@
 transform move_x(x, speed = 0.5):
     yalign 1.0
     linear speed xalign x
+    repeat False
 
 transform move_x_from(f, x, speed = 0.5):
     yalign 1.0
     xalign f
     linear speed xalign x
+    repeat False
 
 transform dance_floor:
     xalign 0.25
@@ -36,3 +38,4 @@ transform jumping:
 transform ver_right:
     xalign 1.1
     yalign 1.0
+    

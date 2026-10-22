@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/auto-highlight.rpy", line 227: expected an indented block after function definition on line 137
-    """Возвращает список (tag, name) для всех показанных на слое."""
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "game/light.rpy", line 231: unexpected indent
+    if tag in ALL_CHARACTERS:
+       ^
 
 Ren'Py Version: Ren'Py 8.5.3.26051504
-Thu Oct 22 15:03:25 2026
+Thu Oct 22 20:07:11 2026

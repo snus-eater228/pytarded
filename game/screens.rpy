@@ -369,8 +369,9 @@ image pack:
 image color_snus2:
     "gui/snus/pack.png"
     zoom 0.75
-    matrixcolor BrightnessMatrix(0.15)
-    matrixcolor HueMatrix(160)
+    matrixcolor BrightnessMatrix(0.35)
+    matrixcolor HueMatrix(-320)
+    matrixcolor SaturationMatrix(5)
 image color_snus3:
     "gui/snus/pack.png"
     zoom 0.75
@@ -471,12 +472,12 @@ screen snus_pack():
         pos (-15, 185)
         at rot2(auto_rot)
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
-        action Preference("auto-forward", "toggle")
+        action Function(show_bug_report_modal)
     
-    text "автокумар\n(авто)":
+    text "паль\n(,баг-репорт)":
         font "gui/Veles.ttf"
         size 18
-        pos (50,240)
+        pos (30,250)
         at rot2(auto_rot)
         color "#000"
 
@@ -487,9 +488,9 @@ screen snus_pack():
         pos (295, 185)
         at rot2(hist_rot)
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
-        action ShowMenu('history')
+        action Function(lambda: renpy.emscripten.run_script("document.getElementById('qr-modal').classList.add('active')"))
     
-    text "снюсология\n(история)":
+    text "чужая шайба\n(загрузиться)":
         font "gui/Veles.ttf"
         size 18
         pos (365,245)
@@ -535,7 +536,7 @@ screen snus_pack():
         pos (65, 260)
         at rot2(qs_rot)
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
-        action QuickSave()
+        action MainMenu()
     
     text "выплюнуть\n(в меню)":
         font "gui/Veles.ttf"
@@ -551,12 +552,12 @@ screen snus_pack():
         pos (175, 175)
         at rot2(ql_rot)
         hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
-        action QuickLoad()
+        action Function(show_qr_modal)
     
-    text "закладка\n(qr код)":
+    text "закладка\n(создать\nqr-код)":
         font "gui/Veles.ttf"
         size 18
-        pos (235,245)
+        pos (245,250)
         at rot2(ql_rot)
         color "#000"
 
@@ -597,7 +598,7 @@ screen quick_menu():
 init python:
     config.overlay_screens.append("quick_menu")
 
-default quick_menu = True
+default quick_menu = False
 
 style quick_button is default
 style quick_button_text is button_text

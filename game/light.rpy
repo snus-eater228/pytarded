@@ -96,32 +96,43 @@ init python:
                     renpy.show(tag, what=image_name)
 
         def _update_all_characters(self):
-            """Перекрашивает всех показанных персонажей с сохранением атрибутов и позиций"""
-            
+            """Перекрашивает всех показанных персонажей с сохранением атрибутов,
+            позиций и других трансформов (sprite_highlight и т.д.)."""
             chars = get_showing_characters_and_states()
-            
+
             for tag, attrs in chars.items():
                 if tag not in ALL_CHARACTERS:
                     continue
-                
-                # Получаем текущий displayable (включая трансформы)
+
                 displayable = renpy.game.context().scene_lists.get_displayable_by_tag("master", tag)
-                
                 if displayable is None:
                     continue
-                
-                # Создаем имя изображения с атрибутами
+
+                # Восстанавливаем базовый at_list (позиция + sprite_highlight + ...)
+                base_at_list = _character_base_at_list.get(tag, [])
+
+                # НОВОЕ: собираем name = "tag attr1 attr2 ..."
+                # (а не what — Ren'Py сам разложит на tag + attrs и найдёт layeredimage)
                 if attrs:
-                    image_name = f"{tag} {' '.join(attrs)}"
+                    full_name = f"{tag} {' '.join(attrs)}"
                 else:
-                    image_name = tag
-                
-                # Показываем с новым освещением
-                # Ren'Py автоматически применит матрицу через трансформ lit_{value}
+                    full_name = tag
+
                 atl_transform = getattr(renpy.store, f"lit_{self._value}")
-                renpy.show(tag, what=image_name, at_list=[atl_transform])
-            
-        
+
+                full_at_list = list(base_at_list) + [atl_transform]
+
+                # ВАЖНО: what=None — Ren'Py ищет по name (правильно для layeredimage)
+                # Вызываем _original_config_show напрямую, чтобы не пройти через
+                # custom_show повторно (иначе lighting накопится в base_at_list)
+                _original_config_show(
+                    full_name,        # ← name с атрибутами       # ← ИСПРАВЛЕНО: было what=image_name
+                    at_list=full_at_list,
+                    zorder=0,
+                    layer='master'
+                )
+
+            renpy.restart_interaction()
     # Функция для удобной установки (опционально)
     def set_light(lighting_type):
         store.current_light.value = lighting_type
@@ -185,15 +196,16 @@ transform lit_pink_nightlight:
 init -1 python:
     # Сохраняем оригинальную функцию показа
     _original_config_show = renpy.config.show
-    
+
+    # НОВОЕ: словарь для сохранения базового at_list персонажа (без lighting)
+    _character_base_at_list = {}
+
     def _get_tag(name):
-        """Безопасно извлекает тег (строка или кортеж)"""
         if isinstance(name, tuple) or isinstance(name, list):
             return name[0]
         return name
 
     def _get_emotion(name):
-        """Извлекает эмоцию из name (может быть строкой или кортежем)"""
         if isinstance(name, tuple):
             if len(name) > 1:
                 return name[1]
@@ -202,58 +214,53 @@ init -1 python:
             if len(parts) > 1:
                 return parts[1]
         return "normal"
-    
+
     def custom_show(name, what=None, at_list=None, zorder=0, behind=None, layer='master', atl=None, **kwargs):
         tag = _get_tag(name)
-        
+
         # ==========================================
         # ОБНОВЛЕНИЕ ЭМОЦИИ ДЛЯ FACETIME
         # ==========================================
         if store.is_facetime and tag == store.facetime_caller:
-            # Пытаемся получить эмоцию из разных источников
             emotion = None
-            
-            # 1. Проверяем name (может быть кортежем ("james", "sad"))
             emotion = _get_emotion(name)
-            
-            # 2. Если не нашли, проверяем what
             if not emotion and what and isinstance(what, str):
                 parts = what.split()
                 if len(parts) > 1:
                     emotion = parts[1]
-            
-            # 3. Если все еще нет, сбрасываем на normal
             if not emotion:
                 emotion = "normal"
-            
-            # Обновляем переменную
             store.facetime_emotion = emotion
-            
-            # Перерисовываем экран телефона
             renpy.restart_interaction()
             return
+
         if tag in ALL_CHARACTERS:
-            # Получаем объект трансформации освещения
+            # НОВОЕ: если at_list не задан — используем ПРЕДЫДУЩИЙ base_at_list,
+            # чтобы позиция/подсветка сохранялись между show без явного `at`
+            if at_list is None:
+                flat_at_list = list(_character_base_at_list.get(tag, []))
+                # _character_base_at_list НЕ обновляем — берём как есть
+            else:
+                # Сплющиваем новый at_list
+                flat_at_list = []
+                for item in at_list:
+                    if isinstance(item, (list, tuple)):
+                        flat_at_list.extend(item)
+                    else:
+                        flat_at_list.append(item)
+                # Запоминаем новый base
+                _character_base_at_list[tag] = list(flat_at_list)
+
+            # Добавляем lighting в конец
             lighting_transform = getattr(
-                renpy.store, 
-                f"lit_{store.current_light.value}", 
+                renpy.store,
+                f"lit_{store.current_light.value}",
                 None
             )
-            
             if lighting_transform:
-                # 1. Сплющиваем (flatten) существующий at_list, чтобы убрать вложенные списки
-                flat_at_list = []
-                if at_list:
-                    for item in at_list:
-                        if isinstance(item, (list, tuple)):
-                            flat_at_list.extend(item)
-                        else:
-                            flat_at_list.append(item)
-                
-                # 2. Добавляем наше освещение в конец плоского списка
                 flat_at_list.append(lighting_transform)
                 at_list = flat_at_list
-        
+
         _original_config_show(name, what=what, at_list=at_list, zorder=zorder, behind=behind, layer=layer, atl=atl, **kwargs)
-    
+
     renpy.config.show = custom_show

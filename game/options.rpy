@@ -210,3 +210,20 @@ init python:
 ## разделённые дробью.
 
 # define build.itch_project = "renpytom/test-project"
+define config.gl2 = True  # Использовать WebGL 2 вместо WebGL 1
+
+# === ОПТИМИЗАЦИЯ ДЛЯ ВЕБ-ВЕРСИИ (HTML5) ===
+
+# 1. Отключаем быстрые сохранения и загрузки (удаляем горячие клавиши)
+init python:
+    config.keymap['quick_save'] = []
+    config.keymap['quick_load'] = []
+
+# 2. Настраиваем автосохранения
+define config.has_autosave = True     # Включаем автосохранения (встроено по умолчанию)
+define config.autosave_slots = 5      # Ограничиваем количество слотов до 5
+define config.autosave_on_quit = True # Сохранять игру при закрытии вкладки браузера
+
+
+# 4. Отключаем пропуск текста (Skipping)
+define config.allow_skipping = False

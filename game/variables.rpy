@@ -1,6 +1,11 @@
 init python:
     renpy.config.hard_rollback_limit = 5
-
+    def my_label_callback(name, abnormal):
+        # Записываем имя текущего лейбла в глобальную переменную store.current_label
+        store.current_label = name
+    config.label_callback = my_label_callback
+    
+default current_label = "start"
 default will = Stat("will")
 default respect = Stat("respect")
 default brain_lars = Stat("brain_lars")
