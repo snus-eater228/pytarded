@@ -45,3 +45,5 @@ default chapters = [
 
 default persistent.progress = "1"
 default rhythm_game = None
+default latest_snapshot_qr = ""
+default current_checkpoint = ""

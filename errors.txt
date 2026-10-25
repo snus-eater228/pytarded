@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/qr_logic.rpy", line 130: expected an indented block after function definition on line 126
-    """Превращает словари с __type__ обратно в объекты Ren'Py"""
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "game/qr_logic.rpy", line 19: expected an indented block after function definition on line 15
+    try:
+        ^^^
 
 Ren'Py Version: Ren'Py 8.5.3.26051504
-Sun Oct 25 11:39:01 2026
+Sun Oct 25 16:03:53 2026

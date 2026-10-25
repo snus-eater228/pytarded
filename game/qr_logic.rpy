@@ -1,5 +1,5 @@
 # game/qr_logic.rpy
-# Система снэпшотов с АВТОМАТИЧЕСКИМ обновлением чекпоинтов и корректной загрузкой
+# Финальная версия: Динамическая система снэпшотов с корректной обработкой прыжков
 
 init python:
     import json
@@ -15,83 +15,56 @@ init python:
     def _save_path(filename):
         return os.path.join(renpy.config.savedir, filename)
 
-    # ==========================================
-    # 1. АВТОМАТИЧЕСКАЯ ГЕНЕРАЦИЯ ЧЕКПОИНТА
-    # ==========================================
     def update_current_checkpoint():
-        """
-        Автоматически обновляет store.current_checkpoint при смене 
-        лейбла, говорящего или сцены.
-        """
         try:
-            # 1. Текущий лейбл (очищаем от недопустимых символов для имен меток)
-            raw_label = renpy.game.context().current.label
+            raw_label = store.current_label
             safe_label = str(raw_label).replace(".", "_").replace("-", "_").replace(" ", "_")
             
-            # 2. Текущий говорящий (из твоего дампа мы знаем, что есть store.speaking_char)
             raw_speaker = getattr(store, 'speaking_char', 'narrator')
             safe_speaker = str(raw_speaker).replace(" ", "_").replace(".", "_")
             
-            # 3. Текущий фон (первый тег на слое master, который НЕ является персонажем)
-            # Мы НЕ используем get_scene_lists, мы используем безопасный get_showing_tags
             tags = renpy.get_showing_tags(layer='master')
             all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
             
-            bg = "unknown_bg"
+            bg = "black"
             for tag in tags:
-                # Ищем первый тег, которого нет в списке персонажей (это и есть фон)
                 if tag not in all_chars:
-                    bg = str(tag).replace(" ", "_").replace(".", "_")
+                    bg = str(tag)
                     break
             
-            # Собираем уникальный ID чекпоинта
             store.current_checkpoint = f"{safe_label}_{safe_speaker}_{bg}"
+            store.current_label = raw_label
             
-        except Exception as e:
-            # Фоллбэк на случай ошибки, чтобы игра не крашнулась
+        except renpy.game.JumpException:
+            raise
+        except Exception:
             store.current_checkpoint = "fallback_checkpoint"
 
-    # ==========================================
-    # 2. КАСТОМНЫЙ JSON-ЭНКОДЕР И ДЕКОДЕР
-    # ==========================================
     class SnapshotEncoder(json.JSONEncoder):
         def default(self, obj):
             class_name = obj.__class__.__name__ if hasattr(obj, '__class__') else ""
             if class_name == "Stat":
                 return {"__type__": "Stat", "x": getattr(obj, 'x', 0)}
             if class_name == "LoveVariable":
-                return {
-                    "__type__": "LoveVariable", 
-                    "x": getattr(obj, 'x', 0), 
-                    "lover": getattr(obj, 'lover', ""),
-                    "prev": getattr(obj, "prev", 0.0)
-                }
+                return {"__type__": "LoveVariable", "x": getattr(obj, 'x', 0), "lover": getattr(obj, 'lover', ""), "prev": getattr(obj, "prev", 0.0)}
             return str(obj)
 
     def reconstruct_object(data):
-        """Превращает словари с __type__ обратно в объекты Ren'Py"""
         if isinstance(data, dict):
             if "__type__" in data:
                 obj_type = data["__type__"]
                 if obj_type == "Stat":
                     return renpy.store.Stat(x=data.get("x", 0))
                 elif obj_type == "LoveVariable":
-                    return renpy.store.LoveVariable(
-                        x=data.get("x", 0), 
-                        lover=data.get("lover", ""), 
-                        prev=data.get("prev", 0.0)
-                    )
+                    return renpy.store.LoveVariable(x=data.get("x", 0), lover=data.get("lover", ""), prev=data.get("prev", 0.0))
             return {k: reconstruct_object(v) for k, v in data.items()}
         elif isinstance(data, list):
             return [reconstruct_object(item) for item in data]
         return data
 
-    # ==========================================
-    # 3. СБОР ДАННЫХ
-    # ==========================================
     def get_serializable_store_vars():
         BLACKLIST = {
-            "chapters", "inpval", "persistent", "current_label", "saved_renpy_keymap",
+            "chapters", "inpval", "persistent", "saved_renpy_keymap",
             "PY2", "main_menu", "mouse_visible", "suppress_overlay", "save_name", 
             "nvl_list", "is_hovered", "is_opened", "is_selected", "quick_menu", 
             "speaking_char", "say_window_show_transform", "nvl_mode",
@@ -104,7 +77,7 @@ init python:
             "lit_normal", "lit_pink", "lit_night", "lit_lightning", "lit_barbie_pink", 
             "lit_bright_blue", "lit_sunlight", "lit_sunrise", "lit_sunset", 
             "lit_green_lamps", "lit_warm_nightlight", "lit_pink_nightlight",
-            "_original_config_show", "_character_base_at_list"
+            "_original_config_show", "_character_base_at_list", "latest_snapshot_qr"
         }
         
         vars_dict = {}
@@ -117,22 +90,17 @@ init python:
             if class_name == "LightVariable":
                 vars_dict[key] = value.value
                 continue
-            
             if class_name in ("Stat", "LoveVariable"):
                 vars_dict[key] = value
                 continue
-
             if isinstance(value, (int, float, str, bool, list, dict)):
                 if isinstance(value, (list, dict)) and len(str(value)) > 2000:
                     continue
                 vars_dict[key] = value
-                
         return vars_dict
 
     def make_snapshot_debug(cp_id):
         try:
-            # Принудительно обновляем чекпоинт прямо перед созданием снимка, 
-            # на случай если коллбэк не сработал
             update_current_checkpoint()
             final_cp_id = getattr(store, 'current_checkpoint', cp_id)
             
@@ -141,48 +109,48 @@ init python:
                 attrs = renpy.get_attributes(tag)
                 chars_data.append({"t": tag, "a": [str(a) for a in attrs]})
 
-            store_vars = get_serializable_store_vars()
+            all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
+            bg = "black"
+            for tag in renpy.get_showing_tags(layer='master'):
+                if tag not in all_chars:
+                    bg = tag
+                    break
 
             snapshot = {
                 "f": 1,
                 "g": "pytarded",
                 "cp": final_cp_id,
-                "lbl": renpy.game.context().current.label,
+                "lbl": store.current_label,
+                "bg": bg,
                 "c": chars_data,
-                "d": store_vars
+                "d": get_serializable_store_vars()
             }
 
-            pretty_json = json.dumps(snapshot, indent=2, ensure_ascii=False, cls=SnapshotEncoder)
-            renpy.log("=== DEBUG SNAPSHOT DATA ===\n" + pretty_json + "\n===========================")
+            renpy.log("=== DEBUG SNAPSHOT DATA ===\n" + json.dumps(snapshot, indent=2, ensure_ascii=False, cls=SnapshotEncoder) + "\n===========================")
 
             compact_json = json.dumps(snapshot, separators=(',', ':'), ensure_ascii=False, cls=SnapshotEncoder)
             compressed = zlib.compress(compact_json.encode('utf-8'), 9)
             return base64.b64encode(compressed).decode('ascii')
 
+        except renpy.game.JumpException:
+            raise
         except Exception as e:
             renpy.error(f"Snapshot generation failed: {e}")
             return None
 
-    # ==========================================
-    # 4. ФУНКЦИИ ДЛЯ ЭКРАНОВ
-    # ==========================================
     def show_qr_modal():
         if not is_web():
             renpy.notify("QR работает только в веб-версии")
             return
 
-        cp_id = getattr(store, 'current_checkpoint', 'start')
+        cp_id = getattr(renpy.store, 'current_checkpoint', store.current_label)
         qr = make_snapshot_debug(cp_id)
 
         if not qr:
             renpy.notify("Не удалось создать снимок.")
             return
 
-        if len(qr) > QR_MAX_CHARS:
-            renpy.notify(f"Снимок слишком большой ({len(qr)} символов)! Лимит: {QR_MAX_CHARS}.")
-            # Не делаем return, чтобы ты могла протестировать
-
-        store.latest_snapshot_qr = qr
+        renpy.store.latest_snapshot_qr = qr
         renpy.emscripten.run_script("window.showQRModal(%s);" % json.dumps(qr))
 
     def show_load_modal():
@@ -192,27 +160,13 @@ init python:
         renpy.emscripten.run_script("window.openLoadModal && window.openLoadModal();")
 
     def show_bug_report_modal():
-        if not is_web():
-            renpy.notify("Баг-репорт работает только в веб-версии")
+        if not is_web(): 
             return
-
-        qr = getattr(store, 'latest_snapshot_qr', None)
-        if not qr:
-            qr = make_snapshot_debug(getattr(store, 'current_checkpoint', 'start'))
-
-        label = renpy.game.context().current.label
-        runtime = 0.0
-        try:
-            runtime = float(renpy.get_game_runtime())
-        except:
-            pass
-
-        renpy.emscripten.run_script("window._bugMeta = %s;" % json.dumps({"label": label, "runtime": runtime}))
+        qr = getattr(store, 'latest_snapshot_qr', None) or make_snapshot_debug(getattr(store, 'current_checkpoint', 'start'))
+        label = store.current_label
+        renpy.emscripten.run_script("window._bugMeta = %s;" % json.dumps({"label": label}))
         renpy.emscripten.run_script("window.openBugModal(%s);" % json.dumps(qr))
 
-    # ==========================================
-    # 5. ЗАГРУЗКА И ВОССТАНОВЛЕНИЕ
-    # ==========================================
     def restore_variables(vars_data):
         for key, value in vars_data.items():
             if key == "current_light" and isinstance(value, str):
@@ -220,70 +174,94 @@ init python:
             else:
                 setattr(renpy.store, key, reconstruct_object(value))
 
-    def load_snapshot_from_qr(qr_data):
+    def update_current_checkpoint():
         try:
-            compressed = base64.b64decode(qr_data)
-            json_str = zlib.decompress(compressed).decode('utf-8')
-            snap = json.loads(json_str)
-
-            if snap.get("g") != "pytarded" or snap.get("f") != 1:
-                renpy.notify("Несовместимая версия сохранения!")
-                return
-
-            restore_variables(snap.get("d", {}))
-
-            cp_id = snap.get("cp", "start")
-            restore_label = "restore_" + cp_id
+            # 1. Получаем РЕАЛЬНЫЙ родительский лейбл (например, "start" или "chapter1")
+            raw_label = renpy.game.context().current.label
             
-            # ВАЖНО: renpy.jump() из interact_callback корректно передает управление.
-            # Но чтобы убедиться, что экран перерисуется, мы можем добавить 
-            # неявный restart_interaction внутри самой метки restore_ в script.rpy
+            # 2. Получаем говорящего и фон для уникальности
+            raw_speaker = getattr(store, 'speaking_char', 'narrator')
+            safe_speaker = str(raw_speaker).replace(" ", "_").replace(".", "_")
             
-            if renpy.has_label(restore_label):
-                renpy.jump(restore_label)
-            else:
-                renpy.notify(f"Метка '{restore_label}' не найдена! Возврат в начало.")
-                renpy.jump("start")
+            tags = renpy.get_showing_tags(layer='master')
+            all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
+            
+            bg = "black"
+            for tag in tags:
+                if tag not in all_chars:
+                    bg = str(tag)
+                    break
+            safe_bg = str(bg).replace(" ", "_").replace(".", "_")
+            
+            # 3. СОЗДАЕМ ИМЯ ЛОКАЛЬНОЙ МЕТКИ (без точки в начале для имени переменной)
+            local_name = f"{safe_bg}_{safe_speaker}"
+            
+            # 4. ПОЛНЫЙ АДРЕС МЕТКИ ДЛЯ REN'PY (с точкой!)
+            # Например: "start.parking_lars"
+            store.current_checkpoint = f"{raw_label}.{local_name}"
+            
+            # Сохраняем и родительский лейбл для отладки
+            store.current_label = raw_label
+            
+        except renpy.game.JumpException:
+            raise
+        except Exception:
+            store.current_checkpoint = "start.fallback"
+            store.current_label = "start"
 
-        except Exception as e:
-            renpy.notify(f"Ошибка чтения QR: {e}")
-
-    # ==========================================
-    # 6. КОЛЛБЭКИ ДЛЯ АВТО-ОБНОВЛЕНИЯ И ИМПОРТА
-    # ==========================================
     def auto_checkpoint_label_callback(name, abnormal):
         if not abnormal:
             update_current_checkpoint()
 
-    def auto_checkpoint_say_callback(event, interact, who, what, kwargs):
+    def auto_checkpoint_say_callback(event, interact, **kwargs):
         if event == "begin" and interact:
             update_current_checkpoint()
 
+    _fs_diagnostic_done = False
+
     def check_snapshot_import_pending():
-        if not is_web():
+        if not is_web(): 
             return
         
         marker_path = _save_path("_qr_snapshot_pending")
+        
         if os.path.exists(marker_path):
+            print("=" * 60)
+            print("✅ [IMPORT] ФАЙЛ НАЙДЕН! НАЧИНАЕМ ЗАГРУЗКУ...")
+            print("=" * 60)
             try:
                 with open(marker_path, "r", encoding="utf-8") as f:
                     qr_data = f.read().strip()
+                
                 os.unlink(marker_path)
+                
                 if qr_data:
                     load_snapshot_from_qr(qr_data)
+                else:
+                    print("⚠️ [IMPORT] Файл был пустым!")
+            except renpy.game.JumpException:
+                raise
             except Exception as e:
+                print(f"❌ [IMPORT] ОШИБКА ЧТЕНИЯ: {e}")
                 renpy.error(f"Snapshot import error: {e}")
 
-    # Регистрируем ВСЕ коллбэки
-    config.label_callback = auto_checkpoint_label_callback
-    config.say_callback = auto_checkpoint_say_callback
+    config.label_callbacks.append(auto_checkpoint_label_callback)
+    config.all_character_callbacks.append(auto_checkpoint_say_callback)
     config.interact_callbacks.append(check_snapshot_import_pending)
 
-    # Инициализация JS переменной
     if is_web():
         renpy.emscripten.run_script("""
             setTimeout(() => {
                 window.PYTARDED_SAVEDIR = %s;
-                console.log("🔗 PYTARDED: Savedir установлен в:", window.PYTARDED_SAVEDIR);
-            }, 1000);
+                console.log("🔗 PYTARDED: Savedir установлен:", window.PYTARDED_SAVEDIR);
+                
+                if (typeof Module !== 'undefined' && Module.FS) {
+                    try {
+                        const files = Module.FS.readdir(window.PYTARDED_SAVEDIR);
+                        console.log("🔗 PYTARDED JS: Файлы в директории:", files);
+                    } catch(e) {
+                        console.error("🔗 PYTARDED JS: Ошибка чтения директории:", e);
+                    }
+                }
+            }, 1500);
         """ % json.dumps(renpy.config.savedir))
