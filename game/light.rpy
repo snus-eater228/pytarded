@@ -1,4 +1,5 @@
 default current_light = LightVariable()
+define ALL_CHARACTERS = ["lars", "james", "kirk", "dave", "nick"]
 init python:
     from renpy.display.matrix import Matrix
     
@@ -46,8 +47,6 @@ init python:
         "classroom_old": Matrix((1.05, 0.0, 0.0, 0.0, 0.0, 0.95, 0.0, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 1.0)),
     }
     
-    # Список всех персонажей (добавь своих)
-    ALL_CHARACTERS = ["lars", "james", "kirk", "dave", "nick"]
     
     class LightVariable:
         """Класс переменной освещения с автоматическим обновлением персонажей"""
@@ -232,8 +231,7 @@ init -1 python:
                 emotion = "normal"
             store.facetime_emotion = emotion
             renpy.restart_interaction()
-            return
-
+            
         if tag in ALL_CHARACTERS:
             # НОВОЕ: если at_list не задан — используем ПРЕДЫДУЩИЙ base_at_list,
             # чтобы позиция/подсветка сохранялись между show без явного `at`

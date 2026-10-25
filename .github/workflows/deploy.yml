@@ -1,23 +1,49 @@
 name: Deploy Ren'Py Web to GitHub Pages
+
 on:
   push:
-    branches: ["main"] # Или master, в зависимости от твоего репо
+    branches: ["main"] # Или master
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout репозитория
         uses: actions/checkout@v4
-      - name: Setup Pages
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Скачивание и запуск Ren'Py SDK для сборки Web
+        run: |
+          # Скачиваем Ren'Py SDK
+          wget https://www.renpy.org/dl/8.5.3/renpy-8.5.3-sdk.tar.bz2
+          tar -xf renpy-8.5.3-sdk.tar.bz2
+          
+          # Собираем веб-версию (замени 'pytarded' на точное имя папки твоей игры, если оно другое)
+          cd renpy-8.5.3-sdk
+          ./renpy.sh web ../pytarded
+          cd ..
+
+      - name: 🛠️ Патчим index.html (Добавляем модалки)
+        run: |
+          python patch_web.py
+
+      - name: Настройка GitHub Pages
         uses: actions/configure-pages@v4
-      - name: Upload artifact
+
+      - name: Загрузка артефакта
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './web' # Путь к папке, которую создал Ren'Py
-      - name: Deploy to GitHub Pages
+          path: './web' # Путь к пропатченной папке web
+
+      - name: Деплой на GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

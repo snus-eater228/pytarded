@@ -29,25 +29,25 @@ define config.check_conflicting_properties = True
 ## Цвета текста в интерфейсе.
 
 ## Акцентный цвет используется в заголовках и подчёркнутых текстах.
-define gui.accent_color = '#cc0066'
+define gui.accent_color = '#eb88ba'
 
 ## Цвет, используемый в текстовой кнопке, когда она не выбрана и не наведена.
-define gui.idle_color = '#707070'
+define gui.idle_color = '#ff00fb'
 
 ## Small_color используется в маленьком тексте, который должен быть ярче/темнее,
 ## для того, чтобы выделяться.
-define gui.idle_small_color = '#606060'
+define gui.idle_small_color = '#f800fc'
 
 ## Цвет, используемых в кнопках и панелях, когда они наведены.
-define gui.hover_color = '#cc0066'
+define gui.hover_color = '#dd81de'
 
 ## Цвет, используемый текстовой кнопкой, когда она выбрана, но не наведена.
 ## Кнопка может быть выбрана, если это текущий экран или текущее значение
 ## настройки.
-define gui.selected_color = '#555555'
+define gui.selected_color = '#e79ec9'
 
 ## Цвет, используемый текстовой кнопкой, когда она не может быть выбрана.
-define gui.insensitive_color = '#7070707f'
+define gui.insensitive_color = '#fff'
 
 ## Цвета, используемые для частей панелей, которые не заполняются. Они
 ## используются не напрямую, а только при воссоздании файлов изображений.
@@ -55,8 +55,8 @@ define gui.muted_color = '#66a9e0'
 define gui.hover_muted_color = '#ea99c1'
 
 ## Цвета, используемые в тексте диалогов и выборов.
-define gui.text_color = '#404040'
-define gui.interface_text_color = '#404040'
+define gui.text_color = '#31081e'
+define gui.interface_text_color = '#5f0d31'
 
 
 ## Шрифты и их размеры #########################################################
@@ -82,6 +82,8 @@ define gui.interface_text_size = 33
 
 ## Размер заголовков в пользовательском интерфейсе.
 define gui.label_text_size = 36
+define gui.text_spacing = 40
+    
 
 ## Размер текста на экране уведомлений.
 define gui.notify_text_size = 24
@@ -275,7 +277,7 @@ define gui.notify_xalign = 0.75
 define gui.choice_spacing = 10
 
 ## Кнопки в секции навигации главного и игрового меню.
-define gui.navigation_spacing = 6
+define gui.navigation_spacing=6
 
 ## Контролирует интервал между настройками.
 define gui.pref_spacing = 15
@@ -494,3 +496,13 @@ init python:
 
         gui.nvl_button_width = 1860
         gui.nvl_button_xpos = 30
+
+## ЦВЕТА ИГРОВОГО МЕНЮ (Настройки, Об игре, Помощь) #######################
+## Черный фон и розовые элементы (не влияет на главное меню и диалоги)
+
+
+# Цвета текста и кнопок внутри игрового меню
+define gui.game_menu_text_color = "#ffffff"       # Белый для отличной читаемости на черном
+define gui.game_menu_hover_color = "#dba9bd"      # Ярко-розовый при наведении
+define gui.game_menu_selected_color = "#c96c9b"   # Светло-розовый для активного/выбранного элемента
+define gui.game_menu_label_color = "#e2a5bd"      # Розовый для заголовков разделов

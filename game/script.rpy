@@ -7,7 +7,7 @@
     scene larsroom pink with dissolve
     $ current_light.value = "pink"
     "когда отец напоследок пожелал тебе удачного дня и положил трубку, ты метнулся в комнату, проверить, не забыл ли чего там"
-    show lars normal at move_x_from(-0.2,0.3)
+    $ move_from("lars normal", -0.2, 0.3)
     "ты вытащил из-под прикроватного ящика один енергетек (розовый монстр) - часть своей заначки"
     show lars smile with dissolve 
     # $ start_facetime("dave", "think", "club", "bright_blue")
@@ -36,8 +36,8 @@
     "ты спустился вниз"
     scene parking sunrise with dissolve
     $ current_light.value = "sunrise"
-    show dave side1 at move_x_from(1.2, 0.6)
-    show lars normal at move_x_from(-0.2, 0.45)
+    $move_from("dave side1", 1.2, 0.6)
+    $move_from("lars normal", -0.2, 0.45)
     d "салам алейкум"
     show dave think with dissolve 
     show lars angry with dissolve 
@@ -841,6 +841,7 @@ label tema:
     "хоть не фредди, уже сойдет"
     "но затащить в кровать кого-то живого..."
     "ты знал, что у вас по учебной программе будет теория вероятности..."
+    show screen fighting_sleep_success
     "в будущем ты сможешь посчитать, кто вероятнее окажется с тобой в кровати - высокая стройная девчушка (такие  с тобой чего-то не тусят) или профессор хэтфилд..."
     show james normal with dissolve 
     j "...про стек и кучу вы больше узнаете на следующих занятиях"
@@ -1450,62 +1451,14 @@ label komn:
     else:
         "дэйв фыркнул и сел на кровать выразительно и нарочито наздражённо ожидая тебя"
         "ты же открыл комп"
-    show screen notify_xp("Тихо", "kitten", "Тишина в чате! Ларс пишет код!\nНапоминание: нужно распечатать ОДНУ СТРОКУ с 3 значениями - имя, возраст, любимое блюдо.\nСтруктура предложения: \nМеня зовут {i}Ларс{/i}, мне {i}17{/i} лет, я люблю поесть {i}то, что сготовит твоя мамка{/i}.", "pp")
-    "..."
-    label pp:
-        python hide:
-            import subprocess
-            import threading
-            import sys
-            store._rollback=False
-            config.has_autosave = False
-            config.has_quicksave = False
-
-            def run_subprocess(callback):
-                global current_process
-
-                if sys.platform == "windows":
-                    current_process = subprocess.Popen([f"{renpy.config.gamedir}/editor/main.exe", store.dz_1_code],stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                elif sys.platform == "darwin":
-                    current_process = subprocess.Popen([f"{renpy.config.gamedir}/editor/main", store.dz_1_code],stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                output = current_process.stdout.read()
-                renpy.invoke_in_main_thread(callback, output)
-            
-            def update_output(output):
-                store.dz_1_code = output.decode("utf-8")
-
-            process_thread = threading.Thread(target=run_subprocess, args=[update_output])
-            process_thread.start()
-            while store.dz_1_code == "":
-                renpy.pause(0.1)
-            with open (f"{renpy.config.gamedir}/log.txt", "a") as file:
-                    file.write(f"DZ: {store.dz_1_code}")
-                    file.write("\n")
-            renpy.store.current_process = None
-            renpy.jump("after_dz")
-            
-            
     label after_dz:
         hide screen notify_xp
         hide screen laptop
         show lars smile at move_x_from(-2, 0.4)
         "ты залил задание на портал в том виде, в каком решил оставить свою писанину"
         "сил больше не было - все буквы в голове путались и ты еле довел дело до хоть какого-то чекпоинта"
-        init python:
-            def check_dz1_test(output):
-                import re
-                pattern = r'^print\("([^"]*\d+[^"]*)"\)'
-                match = re.search(pattern, output)
-                if not match:
-                    return False
-                return True
-
-        $dz_reses.new_dz(check_dz1_test(dz_1_code))
         show dave side2 at move_x_from(-2, 0.2) with dissolve
         d "ну че)"
-        init -1 python:
-            config.has_autosave = True
-            config.has_quicksave = True
         show dave think with dissolve
         "дэйв держал в руке электронку а второй старательно выковыривал козявку из своего ебучего веснушчатого носа"
         d "ебать ты пентиум конечно"

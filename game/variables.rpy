@@ -4,7 +4,7 @@ init python:
         # Записываем имя текущего лейбла в глобальную переменную store.current_label
         store.current_label = name
     config.label_callback = my_label_callback
-    
+
 default current_label = "start"
 default will = Stat("will")
 default respect = Stat("respect")
@@ -17,16 +17,12 @@ default hetstaine = LoveVariable("james", "dave")
 default dave_rel = LoveVariable("dave")
 default branch = 0
 default urok1 = False
-default dz_1_code = ""
-default dz_reses = HomeworkVariable()
 default dave_zakat_photo = False
 
 default nvl_mode = "board"
 
 default dave_ur = False
 default dz_1 = False
-
-default angry_phrases = ["код говна!!", "блять!", "работай же чучело!", "кто это писал погромист ущербный", "ненавижу((("]
 
 default ls = ""
 

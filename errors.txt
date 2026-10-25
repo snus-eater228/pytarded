@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/light.rpy", line 231: unexpected indent
-    if tag in ALL_CHARACTERS:
-       ^
+File "game/qr_logic.rpy", line 130: expected an indented block after function definition on line 126
+    """Превращает словари с __type__ обратно в объекты Ren'Py"""
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ren'Py Version: Ren'Py 8.5.3.26051504
-Thu Oct 22 20:07:11 2026
+Sun Oct 25 11:39:01 2026

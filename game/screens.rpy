@@ -481,21 +481,6 @@ screen snus_pack():
         at rot2(auto_rot)
         color "#000"
 
-    imagebutton:
-        idle "color_snus5"
-        hover "pack_hover"
-        insensitive "pack_insensitive"
-        pos (295, 185)
-        at rot2(hist_rot)
-        hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
-        action Function(lambda: renpy.emscripten.run_script("document.getElementById('qr-modal').classList.add('active')"))
-    
-    text "чужая шайба\n(загрузиться)":
-        font "gui/Veles.ttf"
-        size 18
-        pos (365,245)
-        at rot2(hist_rot)
-        color "#000"
     
     imagebutton:
         idle "color_snus4"
@@ -559,6 +544,22 @@ screen snus_pack():
         size 18
         pos (245,250)
         at rot2(ql_rot)
+        color "#000"
+    
+    imagebutton:
+        idle "color_snus5"
+        hover "pack_hover"
+        insensitive "pack_insensitive"
+        pos (295, 185)
+        at rot2(hist_rot)
+        hovered [SetVariable("is_opened", True), SetVariable("is_hovered", True)]
+        action Function(show_load_modal)
+    
+    text "чужая шайба\n(загрузиться)":
+        font "gui/Veles.ttf"
+        size 18
+        pos (345,245)
+        at rot2(hist_rot)
         color "#000"
 
 screen quick_menu():
@@ -662,7 +663,7 @@ screen navigation():
 
             ## Кнопка выхода блокирована в iOS и не нужна на Android и в веб-
             ## версии.
-            textbutton _("Выход") action Quit(confirm=not main_menu)
+            textbutton _("Выход") action Quit(confirm=True)
 
 
 style navigation_button is gui_button
@@ -674,6 +675,10 @@ style navigation_button:
 
 style navigation_button_text:
     properties gui.text_properties("navigation_button")
+    color gui.game_menu_text_color
+    hover_color gui.game_menu_hover_color
+    selected_color gui.game_menu_selected_color
+    
 
 
 ## Экран главного меню #########################################################
@@ -792,13 +797,8 @@ screen game_menu(title, scroll=None, yinitial=0.0, spacing=0):
 
     textbutton _("Вернуться"):
         style "return_button"
+        action If(main_menu, Hide(), Return())
 
-        action Return()
-
-    label title
-
-    if main_menu:
-        key "game_menu" action ShowMenu("main_menu")
 
 
 style game_menu_outer_frame is empty
@@ -844,7 +844,7 @@ style game_menu_label:
 
 style game_menu_label_text:
     size gui.title_text_size
-    color gui.accent_color
+    color gui.game_menu_label_color  # Теперь заголовки будут розовыми
     yalign 0.5
 
 style return_button:
@@ -888,6 +888,10 @@ style about_text is gui_text
 
 style about_label_text:
     size gui.label_text_size
+    line_spacing 28
+style about_text:
+    line_spacing 10
+    font "gui/inglobal.ttf"
 
 
 ## Экраны загрузки и сохранения ################################################
@@ -1291,137 +1295,56 @@ style history_label_text:
 ## (keyboard_help, mouse_help, и gamepad_help), чтобы показывать актуальную
 ## помощь.
 
-screen help():
+## Экран помощи ################################################################
+##
+## Переписан под конкретные механики игры pytarded
 
+screen help():
     tag menu
 
-    default device = "keyboard"
-
     use game_menu(_("Помощь"), scroll="viewport"):
-
         style_prefix "help"
 
         vbox:
-            spacing 23
+            spacing 35 # Увеличенное расстояние между блоками
 
+            # 1. Сообщить об ошибке
             hbox:
+                label _("🐞 Сообщить об ошибке")
+                text _("Если что-то сломалось, используй кнопку 'паль' в меню снюса. Кратко опиши проблему, и она автоматически улетит разработчику.")
 
-                textbutton _("Клавиатура") action SetScreenVariable("device", "keyboard")
-                textbutton _("Мышь") action SetScreenVariable("device", "mouse")
+            # 2 и 3. QR-сохранения (Экспорт/Импорт)
+            hbox:
+                label _("💾 QR-сохранения")
+                text _("Функции 'закладка' (экспорт) и 'чужая шайба' (импорт) в меню снюса позволяют переносить прогресс между разными устройствами (например, с ПК на телефон) через QR-код или текстовую строку.")
 
-                if GamepadExists():
-                    textbutton _("Геймпад") action SetScreenVariable("device", "gamepad")
+            # 4. Сохранение в слот
+            hbox:
+                label _("📁 Слоты сохранения")
+                text _("Классические слоты работают только в пределах одного устройства и браузера. Используй их для быстрой загрузки, а QR-код — именно для переноса прогресса.")
 
-            if device == "keyboard":
-                use keyboard_help
-            elif device == "mouse":
-                use mouse_help
-            elif device == "gamepad":
-                use gamepad_help
+            # 5. Роллбэк
+            hbox:
+                label _("⏪ Откат (Роллбэк)")
+                text _("Позволяет вернуться на несколько шагов назад, чтобы перечитать или изменить выбор. Важно: в этой игре доступно только 5 последних шагов отката!")
 
+            # 6. Управление звуком
+            hbox:
+                label _("🔊 Звук")
+                text _("Общая громкость музыки, звуков и голоса регулируется в разделе 'Настройки' главного меню.")
 
-screen keyboard_help():
+            # 7. Управление ритм-игрой
+            hbox:
+                label _("🎵 Ритм-игра")
+                text _("Во время мини-игры нажимай клавиши D, F, J, K (или русские В, А, О, Л), когда белые шары достигают цветной зоны. Попадай в ритм для комбо!")
 
-    hbox:
-        label _("Enter")
-        text _("Прохождение диалогов, активация интерфейса.")
-
-    hbox:
-        label _("Пробел")
-        text _("Прохождение диалогов без возможности делать выбор.")
-
-    hbox:
-        label _("Стрелки")
-        text _("Навигация по интерфейсу.")
-
-    hbox:
-        label _("Esc")
-        text _("Вход в игровое меню.")
-
-    hbox:
-        label _("Ctrl")
-        text _("Пропускает диалоги, пока зажат.")
-
-    hbox:
-        label _("Tab")
-        text _("Включает режим пропуска.")
-
-    hbox:
-        label _("Page Up")
-        text _("Откат назад по сюжету игры.")
-
-    hbox:
-        label _("Page Down")
-        text _("Откатывает предыдущее действие вперёд.")
-
-    hbox:
-        label "H"
-        text _("Скрывает интерфейс пользователя.")
-
-    hbox:
-        label "S"
-        text _("Делает снимок экрана.")
-
-    hbox:
-        label "V"
-        text _("Включает поддерживаемый {a=https://www.renpy.org/l/voicing}синтезатор речи{/a}.")
-
-    hbox:
-        label "Shift+A"
-        text _("Открывает меню специальных возможностей.")
+            # 8. Пропуск
+            hbox:
+                label _("⏩ Пропуск")
+                text _("Удержание Ctrl или включение режима пропуска ускоряет показ текста. В настройках можно выбрать: пропускать 'Весь текст' или только 'После выборов'.")
 
 
-screen mouse_help():
-
-    hbox:
-        label _("Левый клик")
-        text _("Прохождение диалогов, активация интерфейса.")
-
-    hbox:
-        label _("Клик колёсиком")
-        text _("Скрывает интерфейс пользователя.")
-
-    hbox:
-        label _("Правый клик")
-        text _("Вход в игровое меню.")
-
-    hbox:
-        label _("Колёсико вверх")
-        text _("Откат назад по сюжету игры.")
-
-    hbox:
-        label _("Колёсико вниз")
-        text _("Откатывает предыдущее действие вперёд.")
-
-
-screen gamepad_help():
-
-    hbox:
-        label _("Правый триггер\nA/Нижняя кнопка")
-        text _("Прохождение диалогов, активация интерфейса.")
-
-    hbox:
-        label _("Левый Триггер\nЛевый Бампер")
-        text _("Откат назад по сюжету игры.")
-
-    hbox:
-        label _("Правый бампер")
-        text _("Откатывает предыдущее действие вперёд.")
-
-    hbox:
-        label _("Крестовина, Стики")
-        text _("Навигация по интерфейсу.")
-
-    hbox:
-        label _("Старт, Гид, B/Правая кнопка")
-        text _("Вход в игровое меню.")
-
-    hbox:
-        label _("Y/Верхняя кнопка")
-        text _("Скрывает интерфейс пользователя.")
-
-    textbutton _("Калибровка") action GamepadCalibrate()
-
+# === СТИЛИ ДЛЯ ЭКРАНА ПОМОЩИ ===
 
 style help_button is gui_button
 style help_button_text is gui_button_text
@@ -1437,15 +1360,19 @@ style help_button_text:
     properties gui.text_properties("help_button")
 
 style help_label:
-    xsize 375
+    xsize 400 # Увеличили ширину заголовка, чтобы текст красиво переносился
     right_padding 30
 
 style help_label_text:
     size gui.text_size
     xalign 1.0
     textalign 1.0
+    color "#ff6b6b" # Делаем заголовки розовыми в стиле игры (опционально, можно убрать эту строку)
 
-
+style help_text:
+    size gui.text_size
+    # Добавляем чуть больше воздуха между строками самого текста
+    line_spacing 5 
 
 ################################################################################
 ## Дополнительные экраны

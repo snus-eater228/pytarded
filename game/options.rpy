@@ -30,6 +30,7 @@ define config.version = "1.0"
 ## Для отделения абзацев оставляйте между ними пустую строку.
 
 define gui.about = _p("""
+ты хайпожор ларсик) твой лучший друг дэйв мастейн - известный треш-блогер, а ты его пиар-менеджер! у вас крутой союз, и вы стоите друг за друга стеной. а потом появился тупорылый редфлажный джеймс хэтфилд, и вы разосрались с лдшкой в пух и прах. или нет?? променяешь ты дружбу на хуй в жопе? решать тебе!
 """)
 
 
@@ -191,6 +192,7 @@ init python:
 
     # build.classify('game/**.png', 'archive')
     # build.classify('game/**.jpg', 'archive')
+    build.classify('game/fonts/**', 'archive')
 
     ## Файлы, соответствующие образцам документации, дублируются в приложениях
     ## Mac, чтобы они появлялись и в приложении, и в zip архиве.
@@ -220,10 +222,10 @@ init python:
     config.keymap['quick_load'] = []
 
 # 2. Настраиваем автосохранения
+define config.has_quicksave = False
 define config.has_autosave = True     # Включаем автосохранения (встроено по умолчанию)
-define config.autosave_slots = 5      # Ограничиваем количество слотов до 5
+define config.autosave_slots = 6      # Ограничиваем количество слотов до 5
 define config.autosave_on_quit = True # Сохранять игру при закрытии вкладки браузера
-
 
 # 4. Отключаем пропуск текста (Skipping)
 define config.allow_skipping = False
