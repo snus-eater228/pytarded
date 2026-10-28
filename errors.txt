@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/qr_logic.rpy", line 19: expected an indented block after function definition on line 15
-    try:
-        ^^^
+File "game/main_menu_xp.rpy", line 342: expected an indented block after 'else' statement on line 44
+    def stop_phonk_radio():
+       ^
 
 Ren'Py Version: Ren'Py 8.5.3.26051504
-Sun Oct 25 16:03:53 2026
+Tue Oct 27 21:39:49 2026

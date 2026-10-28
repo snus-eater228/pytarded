@@ -1,5 +1,5 @@
 # game/qr_logic.rpy
-# Финальная версия: Динамическая система снэпшотов с корректной обработкой прыжков
+# Система снэпшотов для QR-кодов (работает с патчером)
 
 init python:
     import json
@@ -15,38 +15,17 @@ init python:
     def _save_path(filename):
         return os.path.join(renpy.config.savedir, filename)
 
-    def update_current_checkpoint():
-        try:
-            raw_label = store.current_label
-            safe_label = str(raw_label).replace(".", "_").replace("-", "_").replace(" ", "_")
-            
-            raw_speaker = getattr(store, 'speaking_char', 'narrator')
-            safe_speaker = str(raw_speaker).replace(" ", "_").replace(".", "_")
-            
-            tags = renpy.get_showing_tags(layer='master')
-            all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
-            
-            bg = "black"
-            for tag in tags:
-                if tag not in all_chars:
-                    bg = str(tag)
-                    break
-            
-            store.current_checkpoint = f"{safe_label}_{safe_speaker}_{bg}"
-            store.current_label = raw_label
-            
-        except renpy.game.JumpException:
-            raise
-        except Exception:
-            store.current_checkpoint = "fallback_checkpoint"
-
+    # ==========================================
+    # JSON ЭНКОДЕР/ДЕКОДЕР
+    # ==========================================
     class SnapshotEncoder(json.JSONEncoder):
         def default(self, obj):
             class_name = obj.__class__.__name__ if hasattr(obj, '__class__') else ""
             if class_name == "Stat":
                 return {"__type__": "Stat", "x": getattr(obj, 'x', 0)}
             if class_name == "LoveVariable":
-                return {"__type__": "LoveVariable", "x": getattr(obj, 'x', 0), "lover": getattr(obj, 'lover', ""), "prev": getattr(obj, "prev", 0.0)}
+                return {"__type__": "LoveVariable", "x": getattr(obj, 'x', 0), 
+                        "lover": getattr(obj, 'lover', ""), "prev": getattr(obj, "prev", 0.0)}
             return str(obj)
 
     def reconstruct_object(data):
@@ -62,6 +41,9 @@ init python:
             return [reconstruct_object(item) for item in data]
         return data
 
+    # ==========================================
+    # СБОР ПЕРЕМЕННЫХ
+    # ==========================================
     def get_serializable_store_vars():
         BLACKLIST = {
             "chapters", "inpval", "persistent", "saved_renpy_keymap",
@@ -77,7 +59,8 @@ init python:
             "lit_normal", "lit_pink", "lit_night", "lit_lightning", "lit_barbie_pink", 
             "lit_bright_blue", "lit_sunlight", "lit_sunrise", "lit_sunset", 
             "lit_green_lamps", "lit_warm_nightlight", "lit_pink_nightlight",
-            "_original_config_show", "_character_base_at_list", "latest_snapshot_qr"
+            "_original_config_show", "_character_base_at_list", "latest_snapshot_qr",
+            "current_checkpoint", "current_label"
         }
         
         vars_dict = {}
@@ -99,16 +82,29 @@ init python:
                 vars_dict[key] = value
         return vars_dict
 
-    def make_snapshot_debug(cp_id):
+    # ==========================================
+    # СОЗДАНИЕ СНЭПШОТА
+    # ==========================================
+    def make_snapshot_debug():
         try:
-            update_current_checkpoint()
-            final_cp_id = getattr(store, 'current_checkpoint', cp_id)
+            current_label = store.current_label
+            
+            # Сохраняем текущие позиции перед созданием снимка
+            save_character_positions()
             
             chars_data = []
             for tag in renpy.get_showing_tags(layer='master'):
                 attrs = renpy.get_attributes(tag)
-                chars_data.append({"t": tag, "a": [str(a) for a in attrs]})
-
+                
+                # Получаем сохраненные позиции
+                positions = getattr(store, '_saved_character_positions', {}).get(tag, {})
+                
+                chars_data.append({
+                    "t": tag, 
+                    "a": [str(a) for a in attrs],
+                    "p": positions  # ← Теперь это словарь с координатами
+                })
+                    
             all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
             bg = "black"
             for tag in renpy.get_showing_tags(layer='master'):
@@ -119,8 +115,8 @@ init python:
             snapshot = {
                 "f": 1,
                 "g": "pytarded",
-                "cp": final_cp_id,
-                "lbl": store.current_label,
+                "cp": current_label,
+                "lbl": current_label,
                 "bg": bg,
                 "c": chars_data,
                 "d": get_serializable_store_vars()
@@ -131,95 +127,144 @@ init python:
             compact_json = json.dumps(snapshot, separators=(',', ':'), ensure_ascii=False, cls=SnapshotEncoder)
             compressed = zlib.compress(compact_json.encode('utf-8'), 9)
             return base64.b64encode(compressed).decode('ascii')
-
         except renpy.game.JumpException:
             raise
         except Exception as e:
             renpy.error(f"Snapshot generation failed: {e}")
+            import traceback
+            traceback.print_exc()
             return None
+    def save_character_positions():
+        """Сохраняет текущие позиции всех персонажей в store."""
+        positions = {}
+        
+        for tag in renpy.get_showing_tags(layer='master'):
+            if tag in ALL_CHARACTERS:
+                # Получаем текущий transform персонажа
+                displayable = renpy.game.context().scene_lists.get_displayable_by_tag('master', tag)
+                if displayable:
+                    # Извлекаем позицию из transform
+                    # Ren'Py хранит позиции в атрибутах transform
+                    transform_info = getattr(displayable, 'transform', None)
+                    if transform_info:
+                        positions[tag] = {
+                            'xpos': getattr(transform_info, 'xpos', 0.5),
+                            'ypos': getattr(transform_info, 'ypos', 1.0),
+                            'xanchor': getattr(transform_info, 'xanchor', 0.5),
+                            'yanchor': getattr(transform_info, 'yanchor', 1.0),
+                        }
+        
+        # Сохраняем в store
+        store._saved_character_positions = positions
+        #print(f"💾 [POS] Сохранены позиции: {positions}")
 
-    def show_qr_modal():
-        if not is_web():
-            renpy.notify("QR работает только в веб-версии")
-            return
-
-        cp_id = getattr(renpy.store, 'current_checkpoint', store.current_label)
-        qr = make_snapshot_debug(cp_id)
-
-        if not qr:
-            renpy.notify("Не удалось создать снимок.")
-            return
-
-        renpy.store.latest_snapshot_qr = qr
-        renpy.emscripten.run_script("window.showQRModal(%s);" % json.dumps(qr))
-
-    def show_load_modal():
-        if not is_web():
-            renpy.notify("Загрузка работает только в веб-версии")
-            return
-        renpy.emscripten.run_script("window.openLoadModal && window.openLoadModal();")
-
-    def show_bug_report_modal():
-        if not is_web(): 
-            return
-        qr = getattr(store, 'latest_snapshot_qr', None) or make_snapshot_debug(getattr(store, 'current_checkpoint', 'start'))
-        label = store.current_label
-        renpy.emscripten.run_script("window._bugMeta = %s;" % json.dumps({"label": label}))
-        renpy.emscripten.run_script("window.openBugModal(%s);" % json.dumps(qr))
-
+    def restore_visuals_from_snapshot(snap):
+        """Восстанавливает фон, персонажей и свет из снимка."""
+        try:
+            print("🎨 [VISUAL] Начинаем восстановление визуала...")
+            
+            # 1. Восстанавливаем фон
+            bg = snap.get("bg", "black")
+            print(f"🎨 [VISUAL] Фон: {bg}")
+            if bg and bg != "black":
+                renpy.scene(bg)
+            
+            # 2. Восстанавливаем свет
+            current_light = snap.get("d", {}).get("current_light")
+            if current_light and isinstance(current_light, str):
+                print(f"🎨 [VISUAL] Свет: {current_light}")
+                if hasattr(renpy.store, 'LightVariable'):
+                    setattr(renpy.store, 'current_light', renpy.store.LightVariable(initial_value=current_light))
+            
+            # 3. Восстанавливаем персонажей с точными координатами
+            chars = snap.get("c", [])
+            print(f"🎨 [VISUAL] Персонажей в снимке: {len(chars)}")
+            
+            for char_data in chars:
+                tag = char_data.get("t")
+                attrs = char_data.get("a", [])
+                pos_data = char_data.get("p", {})  # ← Словарь с координатами
+                
+                if not tag:
+                    continue
+                
+                name = f"{tag} {' '.join(attrs)}" if attrs else tag
+                print(f"🎨 [VISUAL] Показываем: {name}, координаты: {pos_data}")
+                
+                # Создаем Transform с точными координатами
+                if pos_data:
+                    xpos = pos_data.get('xpos', 0.5)
+                    ypos = pos_data.get('ypos', 1.0)
+                    xanchor = pos_data.get('xanchor', 0.5)
+                    yanchor = pos_data.get('yanchor', 1.0)
+                    
+                    # Создаем кастомный трансформ с позицией
+                    custom_transform = Transform(xpos=xpos, ypos=ypos, xanchor=xanchor, yanchor=yanchor)
+                    
+                    renpy.show(name, at_list=[custom_transform], layer='master')
+                else:
+                    renpy.show(name, layer='master')
+            
+            renpy.with_statement(None)
+            print("✅ [VISUAL] Визуал восстановлен")
+            
+        except Exception as e:
+            renpy.error(f"Visual restore failed: {e}")
+            import traceback
+            traceback.print_exc()
     def restore_variables(vars_data):
+        """Восстанавливает переменные из словаря."""
         for key, value in vars_data.items():
             if key == "current_light" and isinstance(value, str):
                 setattr(renpy.store, key, renpy.store.LightVariable(initial_value=value))
             else:
                 setattr(renpy.store, key, reconstruct_object(value))
 
-    def update_current_checkpoint():
+    def load_snapshot_from_qr(qr_data):
+        """Распаковывает QR, восстанавливает состояние и прыгает на checkpoint-метку."""
         try:
-            # 1. Получаем РЕАЛЬНЫЙ родительский лейбл (например, "start" или "chapter1")
-            raw_label = renpy.game.context().current.label
+            compressed = base64.b64decode(qr_data)
+            json_str = zlib.decompress(compressed).decode('utf-8')
+            snap = json.loads(json_str)
+
+            if snap.get("g") != "pytarded" or snap.get("f") != 1:
+                renpy.notify("Несовместимая версия сохранения!")
+                return
+
+            print("=" * 60)
+            print("🔄 [LOAD] Начинаем загрузку снимка...")
+            print("=" * 60)
+
+            # 1. Восстанавливаем переменные
+            restore_variables(snap.get("d", {}))
+            print("✅ [LOAD] Переменные восстановлены")
+
+            # 2. Восстанавливаем визуал (фон, персонажи, свет)
+            restore_visuals_from_snapshot(snap)
+            print("✅ [LOAD] Визуал восстановлен")
+
+            # 3. Прыгаем на checkpoint-метку
+            cp_id = snap.get("cp", "start")
             
-            # 2. Получаем говорящего и фон для уникальности
-            raw_speaker = getattr(store, 'speaking_char', 'narrator')
-            safe_speaker = str(raw_speaker).replace(" ", "_").replace(".", "_")
-            
-            tags = renpy.get_showing_tags(layer='master')
-            all_chars = getattr(store, 'ALL_CHARACTERS', ["lars", "james", "kirk", "dave", "nick", "larsroom"])
-            
-            bg = "black"
-            for tag in tags:
-                if tag not in all_chars:
-                    bg = str(tag)
-                    break
-            safe_bg = str(bg).replace(" ", "_").replace(".", "_")
-            
-            # 3. СОЗДАЕМ ИМЯ ЛОКАЛЬНОЙ МЕТКИ (без точки в начале для имени переменной)
-            local_name = f"{safe_bg}_{safe_speaker}"
-            
-            # 4. ПОЛНЫЙ АДРЕС МЕТКИ ДЛЯ REN'PY (с точкой!)
-            # Например: "start.parking_lars"
-            store.current_checkpoint = f"{raw_label}.{local_name}"
-            
-            # Сохраняем и родительский лейбл для отладки
-            store.current_label = raw_label
-            
+            if renpy.has_label(cp_id):
+                print(f"🎯 [LOAD] Прыгаем на метку: {cp_id}")
+                renpy.jump(cp_id)
+            else:
+                renpy.notify(f"Метка '{cp_id}' не найдена! Прыгаем на start.")
+                renpy.jump("start")
+                
         except renpy.game.JumpException:
             raise
-        except Exception:
-            store.current_checkpoint = "start.fallback"
-            store.current_label = "start"
+        except Exception as e:
+            renpy.notify(f"Ошибка чтения QR: {e}")
+            import traceback
+            traceback.print_exc()
 
-    def auto_checkpoint_label_callback(name, abnormal):
-        if not abnormal:
-            update_current_checkpoint()
-
-    def auto_checkpoint_say_callback(event, interact, **kwargs):
-        if event == "begin" and interact:
-            update_current_checkpoint()
-
-    _fs_diagnostic_done = False
-
+    # ==========================================
+    # ИМПОРТ ИЗ JS
+    # ==========================================
     def check_snapshot_import_pending():
+        """Проверяет файл, созданный JS сканером."""
         if not is_web(): 
             return
         
@@ -245,10 +290,11 @@ init python:
                 print(f"❌ [IMPORT] ОШИБКА ЧТЕНИЯ: {e}")
                 renpy.error(f"Snapshot import error: {e}")
 
-    config.label_callbacks.append(auto_checkpoint_label_callback)
-    config.all_character_callbacks.append(auto_checkpoint_say_callback)
     config.interact_callbacks.append(check_snapshot_import_pending)
 
+    # ==========================================
+    # ИНИЦИАЛИЗАЦИЯ JS
+    # ==========================================
     if is_web():
         renpy.emscripten.run_script("""
             setTimeout(() => {
@@ -265,3 +311,55 @@ init python:
                 }
             }, 1500);
         """ % json.dumps(renpy.config.savedir))
+
+    # ==========================================
+    # ФУНКЦИИ ДЛЯ ЭКРАНОВ
+    # ==========================================
+    def show_qr_modal():
+        """Генерирует снимок и показывает QR."""
+        if not is_web():
+            renpy.notify("QR работает только в веб-версии")
+            return
+
+        qr = make_snapshot_debug()
+
+        if not qr:
+            renpy.notify("Не удалось создать снимок.")
+            return
+
+        if len(qr) > QR_MAX_CHARS:
+            renpy.notify(
+                f"ВНИМАНИЕ: Снимок слишком большой ({len(qr)} символов)!\n"
+                f"Лимит: {QR_MAX_CHARS}. Посмотри дебаг в логе и вырежь лишние переменные."
+            )
+
+        renpy.store.latest_snapshot_qr = qr
+        renpy.emscripten.run_script("window.showQRModal(%s);" % json.dumps(qr))
+
+    def show_load_modal():
+        """Открывает модалку загрузки."""
+        if not is_web():
+            renpy.notify("Загрузка работает только в веб-версии")
+            return
+        renpy.emscripten.run_script("window.openLoadModal && window.openLoadModal();")
+
+    def show_bug_report_modal():
+        """Открывает модалку баг-репорта с дампом."""
+        if not is_web(): 
+            return
+        qr = getattr(store, 'latest_snapshot_qr', None) or make_snapshot_debug()
+        label = store.current_label
+        renpy.emscripten.run_script("window._bugMeta = %s;" % json.dumps({"label": label}))
+        renpy.emscripten.run_script("window.openBugModal(%s);" % json.dumps(qr))
+
+        # Авто-сохранение позиций на каждом коллбэке
+    def auto_save_positions_label_callback(name, abnormal):
+        if not abnormal:
+            save_character_positions()
+
+    def auto_save_positions_say_callback(event, interact, **kwargs):
+        if event == "begin" and interact:
+            save_character_positions()
+
+    config.label_callbacks.append(auto_save_positions_label_callback)
+    config.all_character_callbacks.append(auto_save_positions_say_callback)

@@ -1,48 +1,9 @@
-renpy.matrixcolor renpy.matrixcolor renpy.texture
-renpy.geometry renpy.mask
-renpy.geometry renpy.texture vape.smoke
-renpy.alpha renpy.geometry renpy.mask
-buzz renpy.texture renpy.texture
-glitch.subtle renpy.texture renpy.texture
-renpy.dissolve renpy.dissolve
-renpy.alpha renpy.solid
-fever.dream renpy.geometry renpy.texture
-renpy.alpha renpy.geometry renpy.matrixcolor renpy.texture
-renpy.matrixcolor renpy.mask renpy.mask
+renpy.alpha renpy.texture
 renpy.texture
-renpy.matrixcolor renpy.alpha renpy.texture
 renpy.dissolve renpy.geometry
-glitch.heavy renpy.texture renpy.texture
-rhythm.fire_text renpy.texture
-renpy.geometry renpy.matrixcolor renpy.texture
-alcohol.party renpy.texture renpy.texture
-renpy.alpha rhythm.fire_text renpy.texture
-renpy.alpha renpy.texture -renpy.texture renpy.blur renpy.texture -renpy.texture renpy.blur
-fever_vision renpy.geometry renpy.matrixcolor renpy.texture
-renpy.matrixcolor renpy.texture
-renpy.matrixcolor fever.vision renpy.texture renpy.texture
-buzz renpy.geometry renpy.texture
+renpy.geometry renpy.solid
 renpy.geometry renpy.texture
 renpy.alpha renpy.geometry renpy.texture
-glitch.subtle renpy.geometry renpy.texture
-renpy.mask renpy.mask
-renpy.alpha renpy.mask renpy.mask
-renpy.matrixcolor fever_vision renpy.texture renpy.texture
-renpy.solid
-fever.dream renpy.geometry renpy.matrixcolor renpy.texture
-renpy.alpha renpy.blur renpy.blur
-renpy.matrixcolor renpy.matrixcolor renpy.matrixcolor renpy.texture
-renpy.alpha renpy.geometry renpy.texture rhythm.fire_text
-renpy.alpha renpy.texture
-alcohol.party renpy.geometry renpy.texture
-glitch.heavy renpy.geometry renpy.texture
-vape.smoke renpy.texture renpy.texture
-renpy.alpha renpy.blur renpy.geometry
-fever.vision renpy.geometry renpy.matrixcolor renpy.texture
-fever.dream renpy.texture renpy.texture
-renpy.matrixcolor fever.dream renpy.texture renpy.texture
+renpy.dissolve renpy.dissolve
 renpy.ftl
-renpy.geometry renpy.texture rhythm.fire_text
-renpy.alpha renpy.geometry renpy.solid
-renpy.geometry renpy.mask renpy.matrixcolor
-renpy.geometry renpy.solid
+renpy.solid

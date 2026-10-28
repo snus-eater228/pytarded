@@ -206,5 +206,4 @@ init python:
 
         return trajectory
 
-define adjusted_bounce_path=calculate_trajectory((300,0),(300,0))
-
+default adjusted_bounce_path = None

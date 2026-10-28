@@ -220,8 +220,19 @@ init -1 python:
         # ==========================================
         # ОБНОВЛЕНИЕ ЭМОЦИИ ДЛЯ FACETIME
         # ==========================================
+        if getattr(store, 'is_facetime', False) and tag == getattr(store, 'facetime_caller', ''):
+            # Просто обновляем эмоцию для facetime_screen
+            emotion = _get_emotion(name)
+            if not emotion and what and isinstance(what, str):
+                parts = what.split()
+                if len(parts) > 1:
+                    emotion = parts[1]
+            if not emotion:
+                emotion = "normal"
+            store.facetime_emotion = emotion
+            renpy.restart_interaction()
+            return
         if store.is_facetime and tag == store.facetime_caller:
-            emotion = None
             emotion = _get_emotion(name)
             if not emotion and what and isinstance(what, str):
                 parts = what.split()

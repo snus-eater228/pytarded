@@ -231,7 +231,7 @@ screen xp_main_menu():
             xpos 50
             idle "play"
             hover "play_hover"
-            action Start()
+            action [Start(), SetVariable(store.adjusted_bounce_path, None)]
         text "Начать\nигру" font "gui/tahoma.ttf" color "#ffffff" size 30
 
         imagebutton:
@@ -261,6 +261,7 @@ screen xp_main_menu():
             hover "exit_hover"
             action Quit()
         text "Выход\nиз системы" font "gui/tahoma.ttf" color "#ffffff" size 30
+        textbutton "radio" action Function(toggle_phonk_radio)
 
     image "gui/xp_menu/browser.png" xsize 1200 ysize 800 xalign 0.5 yalign 0.5
 
@@ -274,21 +275,79 @@ screen xp_main_menu():
         use social_network_ui
 
 
-# --- СКРИНСЕЙВЕР (ТВОЙ КОД БЕЗ ИЗМЕНЕНИЙ) ---
-screen screensaver():       
+    
+init python:
+    def get_bounce_path():
+        """Возвращает кэшированную траекторию, вычисляя её при первом вызове."""
+        if store.adjusted_bounce_path is None:
+            store.adjusted_bounce_path = calculate_trajectory((300, 0), (300, 0))
+            print(f"🎯 [TRAJECTORY] Вычислено {len(store.adjusted_bounce_path)} точек")
+        return store.adjusted_bounce_path
+
+screen screensaver():
+    $ path = get_bounce_path()
     # Твое анимированное лого
     add At(
         Transform("sign", xsize=800, ysize=300),
         PathMotion(
-                adjusted_bounce_path,
-                100.0,
-                repeat=False,
-                bounce=False,
-                sizes=((800, 300))
-            )
-    ) 
+            adjusted_bounce_path,
+            100.0,
+            repeat=False,
+            bounce=False,
+            sizes=((800, 300))
+        )
+    )
     # При клике скрываем скринсейвер и обнуляем таймер, чтобы он не сработал мгновенно снова
     button:
         xysize (1.0, 1.0)
         action [Hide("screensaver"), SetVariable("idle_timer", 0)]
 
+init python:
+        # ==========================================
+    # PHONK RADIO — обёртка с авто-вызовом JS
+    # ==========================================
+    class PhonkVolume:
+        """Обёртка вокруг громкости радио. При изменении значения автоматически
+        отправляет новое значение в браузер через Emscripten."""
+        
+        def __init__(self, initial=0.3):
+            self._value = float(initial)
+        
+        @property
+        def value(self):
+            return self._value
+        
+        @value.setter
+        def value(self, new_value):
+            # Ограничиваем диапазон
+            new_value = max(0.0, min(1.0, float(new_value)))
+            self._value = new_value
+            
+            # Отправляем в браузер
+            if is_web():
+                try:
+                    renpy.emscripten.run_script("window.setPhonkVolume(%f);" % new_value)
+                    print(f" [RADIO] Громкость обновлена: {new_value:.2f}")
+                except Exception as e:
+                    print(f"🎵 [RADIO] Ошибка отправки громкости: {e}")
+        
+        def __float__(self):
+            return self._value
+        
+        def __int__(self):
+            return int(self._value)
+        
+        def __repr__(self):
+            return f"{self._value}"
+
+    def play_phonk_radio():
+        """Запускает радио-поток."""
+        if is_web():
+            renpy.emscripten.run_script("window.playPhonkRadio();")
+
+    def stop_phonk_radio():
+        """Останавливает радио."""
+        if is_web():
+            renpy.emscripten.run_script("window.stopPhonkRadio();")
+
+default phonk_volume = PhonkVolume(0.3)

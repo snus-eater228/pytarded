@@ -877,7 +877,7 @@ screen about():
 
             ## gui.about обычно установлено в options.rpy.
             if gui.about:
-                text "[gui.about!t]\n"
+                text "[gui.about!t]\n" color "#fff"
 
             text _("Сделано с помощью {a=https://www.renpy.org/}Ren'Py{/a} [renpy.version_only].\n\n[renpy.license!t]")
 
@@ -1094,10 +1094,12 @@ screen preferences():
                 vbox:
 
                     if config.has_music:
+                        if Preference("music volume") != 0:
+                            $ play_phonk_radio()
                         label _("Громкость музыки")
-
                         hbox:
-                            bar value Preference("music volume")
+                            bar value FieldValue(store.phonk_volume, "value", range=1.0, step=0.01, max_is_zero=False)
+                    
 
                     if config.has_sound:
 
@@ -1123,7 +1125,7 @@ screen preferences():
                         null height gui.pref_spacing
 
                         textbutton _("Без звука"):
-                            action Preference("all mute", "toggle")
+                            action [Preference("all mute", "toggle"), Function(stop_phonk_radio)]
                             style "mute_all_button"
 
 

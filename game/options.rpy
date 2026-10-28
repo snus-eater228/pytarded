@@ -228,4 +228,6 @@ define config.autosave_slots = 6      # Ограничиваем количес�
 define config.autosave_on_quit = True # Сохранять игру при закрытии вкладки браузера
 
 # 4. Отключаем пропуск текста (Skipping)
-define config.allow_skipping = False
+define config.allow_skipping = True
+define config.rollback_length = 1   # Оставляем только 1 запись (минимум)
+define config.history_length = 5

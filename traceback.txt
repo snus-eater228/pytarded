@@ -1,39 +1,73 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 9, in script
-    "когда отец напоследок пожелал тебе удачного дня и положил трубку, ты метнулся в комнату, проверить, не забыл ли чего там"
-TypeError: auto_checkpoint_say_callback() got an unexpected keyword argument 'type'
+TypeError: 'str' object is not callable
 
 -- Full Traceback ------------------------------------------------------------
 
 Traceback (most recent call last):
-  File "game/script.rpy", line 9, in script
-    "когда отец напоследок пожелал тебе удачного дня и положил трубку, ты метнулся в комнату, проверить, не забыл ли чего там"
-  File "renpy/ast.py", line 2935, in execute
-    Say.execute(self)
-    ~~~~~~~~~~~^^^^^^
-  File "renpy/ast.py", line 994, in execute
-    renpy.exports.say(who, what, *args, **kwargs)
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/exports/sayexports.py", line 129, in say
-    who(what, *args, **kwargs)
-    ~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/character.py", line 1565, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/character.py", line 1220, in do_display
-    display_say(who, what, self.do_show, **display_args)
-    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "renpy/character.py", line 704, in display_say
-    callback("begin")
-    ~~~~~~~~^^^^^^^^^
-  File "renpy/character.py", line 90, in __call__
-    c(*args, **kwargs)
-    ~^^^^^^^^^^^^^^^^^
-TypeError: auto_checkpoint_say_callback() got an unexpected keyword argument 'type'
+  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in script
+    python hide:
+  File "renpy/ast.py", line 1193, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/python.py", line 1276, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/common/_layout/screen_main_menu.rpym", line 28, in <module>
+    python hide:
+  File "renpy/common/_layout/screen_main_menu.rpym", line 35, in _execute_python_hide
+    ui.interact()
+    ~~~~~~~~~~~^^
+  File "renpy/ui.py", line 306, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/core.py", line 2163, in interact
+    repeat, rv = self.interact_core(
+                 ~~~~~~~~~~~~~~~~~~^
+        preloads=preloads,
+        ^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "renpy/display/core.py", line 3263, in interact_core
+    rv = root_widget.event(ev, x, y, 0)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "renpy/display/layout.py", line 1281, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/layout.py", line 1281, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/layout.py", line 1281, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/screen.py", line 805, in event
+    rv = self.child.event(ev, x, y, st)
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "renpy/display/layout.py", line 1281, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/layout.py", line 1281, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/behavior.py", line 1189, in event
+    return handle_click(self.clicked)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "renpy/display/behavior.py", line 1111, in handle_click
+    rv = run(action)
+         ~~~^^^^^^^^
+  File "renpy/display/behavior.py", line 411, in run
+    return action(*args, **kwargs)
+           ~~~~~~^^^^^^^^^^^^^^^^^
+  File "renpy/common/00action_other.rpy", line 618, in __call__
+    rv = self.callable(*self.args, **self.kwargs)
+         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'str' object is not callable
 
 macOS-26.6.2-arm64-arm-64bit arm64
 Ren'Py 8.5.3.26051504
 pytarded 1.0
-Sun Oct 25 12:30:24 2026
+Tue Oct 27 21:40:15 2026
